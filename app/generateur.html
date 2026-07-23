@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Générateur de fiches — Deux challenges par jour</title>
+<link rel="stylesheet" href="css/iep1.css">
+</head>
+<body>
+<div class="iep1-topbar">
+  <strong style="font-family:var(--font-display)">IEP1 — Deux challenges par jour</strong>
+  <nav>
+    <a href="accueil.html">Accueil</a>
+    <a href="generateur.html" class="active">Générateur</a>
+    <a href="corrige.html">Corrigé illustré</a>
+  </nav>
+</div>
+<div class="iep1-shell">
+  <div class="iep1-banner">
+    <h1>Générateur de fiches</h1>
+    <p>Choisissez le niveau, la période et la semaine, puis sélectionnez exactement 8 problèmes.</p>
+  </div>
+
+  <div class="card">
+    <div class="field-row">
+      <div class="field">
+        <label for="sel-niveau">Niveau</label>
+        <select id="sel-niveau"></select>
+      </div>
+      <div class="field">
+        <label for="sel-periode">Période</label>
+        <select id="sel-periode"></select>
+      </div>
+      <div class="field">
+        <label for="sel-semaine">Semaine</label>
+        <select id="sel-semaine"></select>
+      </div>
+    </div>
+    <div id="ref-box"></div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-bottom:8px">Sélectionner les problèmes à utiliser</h3>
+    <table class="problemes" id="tbl-problemes">
+      <thead><tr><th></th><th>N°</th><th>Type</th><th>Énoncé</th><th>Jour</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <div id="lock-msg" style="margin-top:12px"></div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-bottom:12px">Télécharger</h3>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <button class="btn primary" id="btn-eleve-docx">Fiche élève (.docx)</button>
+      <button class="btn navy" id="btn-corrige-docx">Corrigé enseignant (.docx)</button>
+      <button class="btn primary" id="btn-eleve-pdf">Fiche élève (.pdf)</button>
+      <button class="btn navy" id="btn-corrige-pdf">Corrigé enseignant (.pdf)</button>
+    </div>
+    <p id="download-status" style="margin-top:10px;color:var(--text-secondary);font-size:var(--fs-small)"></p>
+  </div>
+</div>
+<footer class="iep1-footer">IEP1 — Inspection de l'Enseignement Primaire, circonscription 1 — Gouvernement de la Nouvelle-Calédonie</footer>
+
+<script src="lib/docx-bundle.js"></script>
+<script src="lib/pdfmake.min.js"></script>
+<script src="lib/vfs_fonts.js"></script>
+<script src="data/cm1.js"></script>
+<script src="data/cm2.js"></script>
+<script src="js/cat-labels.js"></script>
+<script src="js/schemas.js"></script>
+<script src="js/export-docx.js"></script>
+<script src="js/export-pdf.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

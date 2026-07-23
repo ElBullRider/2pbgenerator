@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Corrigé illustré — Deux challenges par jour</title>
+<link rel="stylesheet" href="css/iep1.css">
+</head>
+<body>
+<div class="iep1-topbar">
+  <strong style="font-family:var(--font-display)">IEP1 — Deux challenges par jour</strong>
+  <nav>
+    <a href="accueil.html">Accueil</a>
+    <a href="generateur.html">Générateur</a>
+    <a href="corrige.html" class="active">Corrigé illustré</a>
+  </nav>
+</div>
+<div class="iep1-shell">
+  <div class="iep1-banner">
+    <h1>Corrigé illustré</h1>
+    <p>Aperçu à l'écran du corrigé enseignant, avec les schémas visuels par catégorie.</p>
+  </div>
+
+  <div class="card">
+    <div class="field-row">
+      <div class="field">
+        <label for="sel-niveau">Niveau</label>
+        <select id="sel-niveau"></select>
+      </div>
+      <div class="field">
+        <label for="sel-periode">Période</label>
+        <select id="sel-periode"></select>
+      </div>
+      <div class="field">
+        <label for="sel-semaine">Semaine</label>
+        <select id="sel-semaine"></select>
+      </div>
+    </div>
+    <div id="ref-box"></div>
+  </div>
+
+  <div id="jours" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px"></div>
+</div>
+<footer class="iep1-footer">IEP1 — Inspection de l'Enseignement Primaire, circonscription 1 — Gouvernement de la Nouvelle-Calédonie</footer>
+
+<script src="data/cm1.js"></script>
+<script src="data/cm2.js"></script>
+<script src="js/cat-labels.js"></script>
+<script src="js/schemas.js"></script>
+<script src="js/corrige-view.js"></script>
+</body>
+</html>

@@ -164,6 +164,7 @@ footer.iep1-footer{color:var(--text-muted);font-size:var(--fs-caption);text-alig
 
 /* ===== Impression / export PDF via le navigateur ===== */
 @page{size:A4 landscape;margin:1cm}
+*{-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact}
 @media print{
   .no-print{display:none!important}
   body{background:var(--white)}
@@ -202,7 +203,12 @@ table.eleve-evalgrid thead th.bilan{background:var(--navy-900)}
 .eleve-evalgrid__legend{text-align:center;font-size:var(--fs-small);color:var(--text-secondary);margin-top:var(--space-2)}
 
 /* ===== Corrigé imprimable : compact pour tenir sur une page ===== */
+.corrige-print-banner{margin-bottom:var(--space-4);padding:var(--space-3) var(--space-5)}
+.corrige-print-banner p{color:var(--ink-100)}
 @media print{
+  .corrige-print-banner{margin-bottom:6px;padding:6px 14px}
+  .corrige-print-banner h1{font-size:16px!important}
+  .corrige-print-banner p{font-size:10px;margin:2px 0 0}
   .corrige-band{box-shadow:none;margin-bottom:6px;border-radius:0}
   .corrige-band__badge{flex-basis:70px;padding:4px}
   .corrige-band__badge .num{font-size:20px}

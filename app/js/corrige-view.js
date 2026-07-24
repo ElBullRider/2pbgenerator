@@ -27,6 +27,7 @@
   var elRefBox = document.getElementById('ref-box');
   var elJours = document.getElementById('jours');
   var elPrintBtn = document.getElementById('btn-print');
+  var elPrintBanner = document.getElementById('print-banner');
 
   function escapeHtml(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
 
@@ -98,9 +99,17 @@
     '</div>';
   }
 
+  function bannerHtml(week) {
+    return '<div class="iep1-banner corrige-print-banner" style="text-align:center">' +
+      '<h1 style="color:#fff;font-size:22px">CORRIGÉ ENSEIGNANT — ' + escapeHtml(state.niveau.label) + ' — ' +
+      'Période ' + escapeHtml(state.periode.replace('P', '')) + ' — Semaine ' + escapeHtml(state.semaine.replace('S', '')) + '</h1>' +
+      '<p>' + escapeHtml(week.ref) + '</p></div>';
+  }
+
   function render() {
     var week = currentWeek();
     elRefBox.innerHTML = week ? '<p style="margin-top:12px"><span class="tag tone-navy">Semaine</span> &nbsp;' + escapeHtml(week.ref) + '</p>' : '';
+    elPrintBanner.innerHTML = week ? bannerHtml(week) : '';
     elJours.innerHTML = '';
     if (!week) return;
     var problems = week[state.niveau.key];

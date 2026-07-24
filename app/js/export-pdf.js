@@ -1,8 +1,8 @@
 /*
  * Export PDF — pdfmake (lib/pdfmake.min.js + lib/vfs_fonts.js, Roboto
- * embarqué par défaut, aucune dépendance internet). Mêmes mises en page que
- * export-docx.js : fiche élève portrait 2 jours/page, corrigé paysage
- * 4 jours/page.
+ * embarqué par défaut, aucune dépendance internet). Paysage, marges
+ * étroites, mêmes principes de mise en page que export-docx.js : bandes
+ * pleine largeur pour le corrigé, cellules larges pour la fiche élève.
  */
 (function (global) {
   'use strict';
@@ -14,39 +14,59 @@
 
   var JOUR_HEX = ['#005E86', '#24952E', '#DC472F', '#0F2942'];
   var JOUR_HEX_LIGHT = ['#E3F0F7', '#E7F5EA', '#FDEAE6', '#E5E9EC'];
+  var NARROW_MARGIN = 20; // points, ~0,28 in
 
   function bannerBlock(meta) {
     return [
       { text: 'DEUX CHALLENGES PAR JOUR — ' + meta.niveau + ' — ' + meta.periodeLabel + ' — ' + meta.semaineLabel,
-        bold: true, fontSize: 15, color: 'white', fillColor: '#0F2942', margin: [8, 6, 8, 6] },
-      { text: meta.ref || '', italics: true, fontSize: 9, color: '#3E5468', margin: [0, 4, 0, 8] },
+        bold: true, fontSize: 18, color: 'white', fillColor: '#0F2942', margin: [10, 8, 10, 8] },
+      { text: meta.ref || '', italics: true, fontSize: 10, color: '#3E5468', margin: [0, 5, 0, 10] },
     ];
   }
 
-  // ---------------- Fiche élève : portrait, 2 jours / page ---------------
+  // ---------------- Fiche élève : paysage, cellules larges ----------------
   function jourTableEleve(jourIdx, problems) {
     var body = [[
-      { text: 'N°', bold: true, fillColor: JOUR_HEX_LIGHT[jourIdx] },
-      { text: 'Schéma / modélisation', bold: true, fillColor: JOUR_HEX_LIGHT[jourIdx] },
-      { text: 'Calcul', bold: true, fillColor: JOUR_HEX_LIGHT[jourIdx] },
-      { text: 'Réponse', bold: true, fillColor: JOUR_HEX_LIGHT[jourIdx] },
+      { text: 'N° / Énoncé', bold: true, fillColor: JOUR_HEX_LIGHT[jourIdx], fontSize: 11 },
+      { text: 'Schéma / modélisation', bold: true, fillColor: JOUR_HEX_LIGHT[jourIdx], fontSize: 11 },
+      { text: 'Calcul', bold: true, fillColor: JOUR_HEX_LIGHT[jourIdx], fontSize: 11 },
+      { text: 'Réponse', bold: true, fillColor: JOUR_HEX_LIGHT[jourIdx], fontSize: 11 },
     ]];
     problems.forEach(function (p, i) {
       body.push([
-        { text: (i + 1) + '. ' + p.enonce, fontSize: 9 },
-        { text: '' }, { text: '' }, { text: '' },
+        { text: (i + 1) + '. ' + p.enonce, fontSize: 11, margin: [0, 14, 0, 14] },
+        { text: '', margin: [0, 14, 0, 14] }, { text: '', margin: [0, 14, 0, 14] }, { text: '', margin: [0, 14, 0, 14] },
       ]);
     });
     return [
-      { text: 'JOUR ' + (jourIdx + 1), bold: true, color: 'white', fillColor: JOUR_HEX[jourIdx], fontSize: 12, margin: [4, 3, 4, 3] },
-      { table: { widths: [90, '*', 70, 70], body: body }, layout: { hLineColor: '#C7D0D8', vLineColor: '#C7D0D8' }, margin: [0, 0, 0, 10] },
+      { text: 'JOUR ' + (jourIdx + 1), bold: true, color: 'white', fillColor: JOUR_HEX[jourIdx], fontSize: 14, margin: [6, 4, 6, 4] },
+      { table: { widths: ['26%', '25%', '25%', '24%'], body: body }, layout: { hLineColor: '#C7D0D8', vLineColor: '#C7D0D8' }, margin: [0, 0, 0, 12] },
     ];
   }
 
   function evalGridTable() {
-    var body = [[{ text: 'Jour', bold: true }, { text: 'Problème 1', bold: true }, { text: 'Problème 2', bold: true }]];
-    for (var j = 1; j <= 4; j++) body.push(['Jour ' + j, '', '']);
-    return { table: { widths: [60, 80, 80], body: body }, layout: { hLineColor: '#C7D0D8', vLineColor: '#C7D0D8' } };
+    var body = [[
+      { text: 'Jour', bold: true, color: 'white', fillColor: '#0F2942' },
+      { text: 'Problème 1', bold: true, color: 'white', fillColor: '#0F2942', alignment: 'center' },
+      { text: 'Problème 2', bold: true, color: 'white', fillColor: '#0F2942', alignment: 'center' },
+    ]];
+    for (var j = 0; j < 4; j++) {
+      body.push([
+        { text: 'Jour ' + (j + 1), bold: true, fillColor: JOUR_HEX_LIGHT[j], margin: [0, 8, 0, 8] },
+        { text: '☆ ☆ ☆', alignment: 'center', fontSize: 16, color: '#C7D0D8', margin: [0, 8, 0, 8] },
+        { text: '☆ ☆ ☆', alignment: 'center', fontSize: 16, color: '#C7D0D8', margin: [0, 8, 0, 8] },
+      ]);
+    }
+    return {
+      columns: [
+        { width: '50%', table: { widths: [70, '*', '*'], body: body }, layout: { hLineColor: '#C7D0D8', vLineColor: '#C7D0D8' } },
+        { width: '50%', margin: [16, 4, 0, 0], fontSize: 10, stack: [
+          { text: [{ text: '★ ', color: '#E3A429' }, 'Réponse juste'] },
+          { text: [{ text: '★★ ', color: '#E3A429' }, 'Réponse juste + démarche correcte'] },
+          { text: [{ text: '★★★ ', color: '#E3A429' }, 'Réponse juste + démarche + vérification'] },
+        ] },
+      ],
+    };
   }
 
   function buildFicheElevePdf(joursProblems, meta) {
@@ -57,36 +77,45 @@
       .concat(bannerBlock(meta))
       .concat(jourTableEleve(2, joursProblems[2]))
       .concat(jourTableEleve(3, joursProblems[3]))
-      .concat([{ text: 'Ma grille d’évaluation', bold: true, margin: [0, 6, 0, 4] }, evalGridTable()]);
-    return { pageOrientation: 'portrait', pageSize: 'A4', content: content, defaultStyle: { font: 'Roboto', fontSize: 10 } };
+      .concat([{ text: 'Ma grille d’évaluation', bold: true, fontSize: 13, margin: [0, 8, 0, 6] }, evalGridTable()]);
+    return { pageOrientation: 'landscape', pageSize: 'A4', pageMargins: [NARROW_MARGIN, NARROW_MARGIN, NARROW_MARGIN, NARROW_MARGIN], content: content, defaultStyle: { font: 'Roboto', fontSize: 11 } };
   }
 
-  // ---------------- Corrigé : paysage, 4 jours sur une page --------------
-  function jourColumnCorrige(jourIdx, problems) {
-    var stack = [{ text: 'JOUR ' + (jourIdx + 1), bold: true, color: 'white', fillColor: JOUR_HEX[jourIdx], fontSize: 11, margin: [3, 2, 3, 2] }];
-    problems.forEach(function (p, i) {
-      stack.push({ text: (i + 1) + '. ' + p.enonce, bold: true, fontSize: 8, margin: [0, 4, 0, 2] });
-      stack.push(buildSchemaPdf(p));
-      stack.push({ text: 'Calcul : ' + p.calcul, fontSize: 7.5, margin: [0, 2, 0, 0] });
-      stack.push({ text: 'Réponse : ' + p.reponse, bold: true, color: JOUR_HEX[jourIdx], fontSize: 8.5 });
-      stack.push({ text: p.explication || '', italics: true, fontSize: 7, color: '#3E5468', margin: [0, 1, 0, 4] });
-    });
-    return { stack: stack, fillColor: JOUR_HEX_LIGHT[jourIdx], margin: [2, 2, 2, 2] };
+  // ---------------- Corrigé : paysage, une bande pleine largeur par jour --
+  function problemCellCorrige(p, jourIdx, num) {
+    return {
+      stack: [
+        { text: num + '. ' + p.enonce, bold: true, fontSize: 10.5, margin: [0, 4, 0, 3] },
+        buildSchemaPdf(p),
+        { text: 'Calcul : ' + p.calcul, fontSize: 10, margin: [0, 3, 0, 0] },
+        { text: 'Réponse : ' + p.reponse, bold: true, color: JOUR_HEX[jourIdx], fontSize: 11.5 },
+        { text: p.explication || '', italics: true, fontSize: 9, color: '#3E5468', margin: [0, 1, 0, 4] },
+      ],
+    };
+  }
+
+  function jourBandCorrige(jourIdx, problems) {
+    var col1 = Object.assign({ width: '50%', fillColor: JOUR_HEX_LIGHT[jourIdx], margin: [8, 6, 8, 6] }, problemCellCorrige(problems[0], jourIdx, 1));
+    var col2 = Object.assign({ width: '50%', fillColor: JOUR_HEX_LIGHT[jourIdx], margin: [8, 6, 8, 6] }, problemCellCorrige(problems[1], jourIdx, 2));
+    return [
+      { text: 'JOUR ' + (jourIdx + 1), bold: true, color: 'white', fillColor: JOUR_HEX[jourIdx], fontSize: 13, margin: [8, 4, 8, 4] },
+      { columns: [col1, col2], columnGap: 4, margin: [0, 0, 0, 10] },
+    ];
   }
 
   function buildCorrigePdf(joursProblems, meta) {
-    var cols = [0, 1, 2, 3].map(function (i) { return jourColumnCorrige(i, joursProblems[i]); });
-    var content = bannerBlock(meta).concat([
-      { columns: cols, columnGap: 6 },
+    var content = bannerBlock(meta);
+    for (var j = 0; j < 4; j++) content = content.concat(jourBandCorrige(j, joursProblems[j]));
+    content = content.concat([
       {
         columns: [
-          { text: [{ text: 'Méthode\n', bold: true, color: '#005E86' }, { text: 'Repérer les grandeurs, choisir l’opération, calculer, vérifier la cohérence du résultat.', fontSize: 8 }], fillColor: '#F7F9FB', margin: [6, 6, 6, 6] },
-          { text: [{ text: 'À retenir\n', bold: true, color: '#DC472F' }, { text: 'Toujours vérifier les unités et l’ordre de grandeur de la réponse.', fontSize: 8 }], fillColor: '#FDEAE6', margin: [6, 6, 6, 6] },
+          { text: [{ text: 'Méthode\n', bold: true, color: '#005E86' }, { text: 'Repérer les grandeurs, choisir l’opération, calculer, vérifier la cohérence du résultat.', fontSize: 9.5 }], fillColor: '#F7F9FB', margin: [8, 8, 8, 8] },
+          { text: [{ text: 'À retenir\n', bold: true, color: '#DC472F' }, { text: 'Toujours vérifier les unités et l’ordre de grandeur de la réponse.', fontSize: 9.5 }], fillColor: '#FDEAE6', margin: [8, 8, 8, 8] },
         ],
-        columnGap: 6, margin: [0, 10, 0, 0],
+        columnGap: 8, margin: [0, 6, 0, 0],
       },
     ]);
-    return { pageOrientation: 'landscape', pageSize: 'A4', content: content, defaultStyle: { font: 'Roboto', fontSize: 9 } };
+    return { pageOrientation: 'landscape', pageSize: 'A4', pageMargins: [NARROW_MARGIN, NARROW_MARGIN, NARROW_MARGIN, NARROW_MARGIN], content: content, defaultStyle: { font: 'Roboto', fontSize: 10 } };
   }
 
   function downloadPdf(docDefinition, filename) {

@@ -56,7 +56,7 @@ a{color:var(--link)}
 a:hover{color:var(--link-hover)}
 
 /* ===== Layout partagé (bandeau + navigation) ===== */
-.iep1-shell{max-width:1100px;margin:0 auto;padding:var(--space-6) var(--space-5) var(--space-9)}
+.iep1-shell{width:80%;max-width:none;margin:0 auto;padding:var(--space-6) 0 var(--space-9)}
 .iep1-topbar{
   background:var(--surface-navy);color:var(--text-on-dark);
   padding:var(--space-4) var(--space-6);display:flex;align-items:center;gap:var(--space-4);
@@ -118,22 +118,39 @@ table.problemes th{background:var(--paper);text-align:left;padding:var(--space-2
   font-family:var(--font-display);font-weight:var(--fw-bold);color:var(--text-secondary);border-bottom:2px solid var(--border-subtle)}
 table.problemes td{padding:var(--space-2) var(--space-3);border-bottom:1px solid var(--border-subtle);vertical-align:top}
 
-/* ===== Fiche (aperçu écran corrigé illustré) ===== */
-.fiche-jour{border:1px solid var(--border-subtle);border-radius:var(--radius-md);overflow:hidden;margin-bottom:var(--space-4)}
-.fiche-jour__header{color:var(--white);font-family:var(--font-display);font-weight:var(--fw-bold);
-  padding:var(--space-2) var(--space-4);letter-spacing:var(--ls-caption)}
-.fiche-jour--1 .fiche-jour__header{background:var(--jour1)}
-.fiche-jour--2 .fiche-jour__header{background:var(--jour2)}
-.fiche-jour--3 .fiche-jour__header{background:var(--jour3)}
-.fiche-jour--4 .fiche-jour__header{background:var(--jour4)}
-.fiche-jour--1{border-color:var(--jour1)}
-.fiche-jour--2{border-color:var(--jour2)}
-.fiche-jour--3{border-color:var(--jour3)}
-.fiche-jour--4{border-color:var(--jour4)}
-.fiche-probleme{display:grid;grid-template-columns:2fr 2fr 1fr 1fr;gap:0;border-top:1px solid var(--border-subtle)}
-.fiche-probleme > div{padding:var(--space-3);font-size:var(--fs-small)}
-.fiche-probleme__enonce{font-size:var(--fs-body)}
-.fiche-probleme__schema svg{max-width:100%;height:auto}
+/* ===== Corrigé illustré : une bande pleine largeur par problème ===== */
+.corrige-band{
+  display:flex;align-items:stretch;gap:0;background:var(--white);border-radius:var(--radius-md);
+  box-shadow:var(--shadow-card);margin-bottom:var(--space-4);overflow:hidden;border-left:8px solid var(--jour1);
+}
+.corrige-band--1{border-left-color:var(--jour1)}
+.corrige-band--2{border-left-color:var(--jour2)}
+.corrige-band--3{border-left-color:var(--jour3)}
+.corrige-band--4{border-left-color:var(--jour4)}
+.corrige-band__badge{
+  flex:0 0 90px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  color:var(--white);font-family:var(--font-display);font-weight:var(--fw-bold);text-align:center;padding:var(--space-2);
+}
+.corrige-band--1 .corrige-band__badge{background:var(--jour1)}
+.corrige-band--2 .corrige-band__badge{background:var(--jour2)}
+.corrige-band--3 .corrige-band__badge{background:var(--jour3)}
+.corrige-band--4 .corrige-band__badge{background:var(--jour4)}
+.corrige-band__badge .jour{font-size:var(--fs-small);letter-spacing:var(--ls-caption)}
+.corrige-band__badge .num{font-size:28px;line-height:1}
+.corrige-band__enonce{flex:1.6 1 260px;padding:var(--space-4);border-right:1px solid var(--border-subtle)}
+.corrige-band__enonce .cat{display:block;color:var(--text-secondary);font-family:var(--font-display);font-weight:var(--fw-bold);font-size:var(--fs-small);margin-bottom:6px}
+.corrige-band__schema{flex:1.4 1 260px;padding:var(--space-3);display:flex;align-items:center;justify-content:center;border-right:1px solid var(--border-subtle);background:var(--paper)}
+.corrige-band__schema svg{max-width:100%;height:auto}
+.corrige-band__answer{flex:1 1 200px;padding:var(--space-4);display:flex;flex-direction:column;gap:8px;justify-content:center}
+.corrige-band__answer .calc{font-size:var(--fs-body);color:var(--text-secondary)}
+.corrige-band__answer .rep{font-family:var(--font-display);font-weight:var(--fw-bold);font-size:var(--fs-h4)}
+.corrige-band__answer .expl{font-size:var(--fs-small);font-style:italic;color:var(--text-secondary)}
+.corrige-daylabel{font-family:var(--font-display);font-weight:var(--fw-bold);color:var(--white);
+  padding:var(--space-2) var(--space-4);border-radius:var(--radius-sm);display:inline-block;margin:var(--space-5) 0 var(--space-3)}
+.corrige-daylabel--1{background:var(--jour1)}
+.corrige-daylabel--2{background:var(--jour2)}
+.corrige-daylabel--3{background:var(--jour3)}
+.corrige-daylabel--4{background:var(--jour4)}
 
 /* ===== StatBlock (grille d'évaluation / bilan) ===== */
 .statblock{text-align:center;padding:var(--space-4)}

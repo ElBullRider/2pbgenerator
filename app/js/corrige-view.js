@@ -62,13 +62,17 @@
     state.semaine = elSemaine.value || weeks[0];
   }
 
-  function problemBlock(p) {
-    return '<div class="fiche-probleme">' +
-      '<div class="fiche-probleme__enonce"><strong>' + escapeHtml(catLabel(p.cat)) + '</strong><br>' + escapeHtml(p.enonce) + '</div>' +
-      '<div class="fiche-probleme__schema">' + buildSchemaSVG(p) + '</div>' +
-      '<div>' + escapeHtml(p.calcul) + '</div>' +
-      '<div><strong>' + escapeHtml(p.reponse) + '</strong></div>' +
-      '</div>';
+  function problemBand(p, jourIdx, num) {
+    return '<div class="corrige-band corrige-band--' + jourIdx + '">' +
+      '<div class="corrige-band__badge"><span class="jour">JOUR ' + jourIdx + '</span><span class="num">' + num + '</span></div>' +
+      '<div class="corrige-band__enonce"><span class="cat">' + escapeHtml(catLabel(p.cat)) + '</span>' + escapeHtml(p.enonce) + '</div>' +
+      '<div class="corrige-band__schema">' + buildSchemaSVG(p) + '</div>' +
+      '<div class="corrige-band__answer">' +
+        '<div class="calc">' + escapeHtml(p.calcul) + '</div>' +
+        '<div class="rep">' + escapeHtml(p.reponse) + '</div>' +
+        '<div class="expl">' + escapeHtml(p.explication || '') + '</div>' +
+      '</div>' +
+    '</div>';
   }
 
   function render() {
@@ -77,21 +81,17 @@
     elJours.innerHTML = '';
     if (!week) return;
     var problems = week[state.niveau.key];
+    var html = '';
     for (var j = 0; j < 4; j++) {
-      var div = document.createElement('div');
-      div.className = 'fiche-jour fiche-jour--' + (j + 1);
-      var html = '<div class="fiche-jour__header">JOUR ' + (j + 1) + '</div>';
-      html += problemBlock(problems[j * 2]) + problemBlock(problems[j * 2 + 1]);
-      div.innerHTML = html;
-      elJours.appendChild(div);
+      html += '<div class="corrige-daylabel corrige-daylabel--' + (j + 1) + '">JOUR ' + (j + 1) + '</div>';
+      html += problemBand(problems[j * 2], j + 1, 1) + problemBand(problems[j * 2 + 1], j + 1, 2);
     }
     var bonus = problems.filter(function (p) { return p.bonus; });
     if (bonus.length) {
-      var bdiv = document.createElement('div');
-      bdiv.className = 'fiche-jour fiche-jour--4';
-      bdiv.innerHTML = '<div class="fiche-jour__header">BONUS</div>' + bonus.map(problemBlock).join('');
-      elJours.appendChild(bdiv);
+      html += '<div class="corrige-daylabel corrige-daylabel--4">BONUS</div>';
+      bonus.forEach(function (p, i) { html += problemBand(p, 4, i + 1); });
     }
+    elJours.innerHTML = html;
   }
 
   function wire() {

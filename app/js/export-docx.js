@@ -123,7 +123,6 @@
       children.push(para('', { after: 160 }));
     });
     children.push(new docx.Paragraph({ pageBreakBefore: true, children: [] }));
-    children.push.apply(children, headerBanner(meta));
     [2, 3].forEach(function (i) {
       children.push(buildJourTableEleve(i, joursProblems[i]));
       children.push(para('', { after: 160 }));

@@ -74,7 +74,6 @@
       .concat(jourTableEleve(0, joursProblems[0]))
       .concat(jourTableEleve(1, joursProblems[1]))
       .concat([{ text: '', pageBreak: 'after' }])
-      .concat(bannerBlock(meta))
       .concat(jourTableEleve(2, joursProblems[2]))
       .concat(jourTableEleve(3, joursProblems[3]))
       .concat([evalGridTable(), evalLegend()]);

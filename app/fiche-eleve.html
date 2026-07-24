@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Fiche élève — Deux challenges par jour</title>
+<link rel="stylesheet" href="css/iep1.css">
+</head>
+<body>
+<div class="iep1-topbar no-print">
+  <strong style="font-family:var(--font-display)">IEP1 — Deux challenges par jour</strong>
+  <nav>
+    <a href="accueil.html">Accueil</a>
+    <a href="generateur.html">Générateur</a>
+    <a href="corrige.html">Corrigé illustré</a>
+  </nav>
+</div>
+<div class="iep1-shell">
+  <div class="print-toolbar no-print">
+    <button class="btn primary" id="btn-print">Imprimer / Enregistrer en PDF</button>
+    <a class="btn outline" href="generateur.html">← Retour au générateur</a>
+  </div>
+  <div id="content"></div>
+</div>
+
+<script src="data/cm1.js"></script>
+<script src="data/cm2.js"></script>
+<script src="js/cat-labels.js"></script>
+<script src="js/fiche-eleve-view.js"></script>
+</body>
+</html>

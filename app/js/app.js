@@ -1,5 +1,6 @@
 /* Logique UI de la page générateur : sélection niveau/période/semaine,
- * verrouillage à 8 problèmes, câblage des 4 boutons de téléchargement. */
+ * verrouillage à 8 problèmes, mise à jour des liens vers les vues
+ * imprimables (fiche-eleve.html / corrige.html). */
 (function () {
   'use strict';
   var catLabel = window.IEP1CatLabels.catLabel;
@@ -20,7 +21,8 @@
   var elRefBox = document.getElementById('ref-box');
   var elTbody = document.querySelector('#tbl-problemes tbody');
   var elLockMsg = document.getElementById('lock-msg');
-  var elStatus = document.getElementById('download-status');
+  var elLnkEleve = document.getElementById('lnk-eleve');
+  var elLnkCorrige = document.getElementById('lnk-corrige');
 
   function currentWeek() {
     if (!state.niveau.data || !state.periode || !state.semaine) return null;
@@ -116,37 +118,27 @@
     });
   }
 
+  function viewUrl(page) {
+    var indices = Array.from(state.selected).sort(function (a, b) { return a - b; });
+    var qs = new URLSearchParams();
+    qs.set('niveau', state.niveau.code);
+    qs.set('periode', state.periode);
+    qs.set('semaine', state.semaine);
+    qs.set('sel', indices.join(','));
+    return page + '?' + qs.toString();
+  }
+
   function renderLockState() {
     var n = state.selected.size;
     var ok = n === 8;
     elLockMsg.innerHTML = ok
-      ? '<span class="tag tone-green">8 problèmes sélectionnés</span> — vous pouvez télécharger les fiches.'
+      ? '<span class="tag tone-green">8 problèmes sélectionnés</span> — vous pouvez ouvrir les fiches.'
       : '<span class="tag tone-orange">' + n + ' / 8 sélectionnés</span> — coche/décoche pour arriver exactement à 8.';
-    ['btn-eleve-docx', 'btn-corrige-docx', 'btn-eleve-pdf', 'btn-corrige-pdf'].forEach(function (id) {
-      document.getElementById(id).disabled = !ok;
-    });
-  }
-
-  function selectedInJours() {
-    var problems = currentProblems();
-    var indices = Array.from(state.selected).sort(function (a, b) { return a - b; });
-    var jours = [[], [], [], []];
-    indices.forEach(function (idx, pos) { jours[Math.floor(pos / 2)].push(problems[idx]); });
-    return jours;
-  }
-
-  function meta() {
-    var week = currentWeek();
-    return {
-      niveau: state.niveau.label,
-      periodeLabel: 'Période ' + state.periode.replace('P', ''),
-      semaineLabel: 'Semaine ' + state.semaine.replace('S', ''),
-      ref: week ? week.ref : '',
-    };
-  }
-
-  function filenameBase() {
-    return state.periode + '_' + state.semaine + '_' + state.niveau.code;
+    [elLnkEleve, elLnkCorrige].forEach(function (el) { el.classList.toggle('disabled', !ok); });
+    if (ok) {
+      elLnkEleve.href = viewUrl('fiche-eleve.html');
+      elLnkCorrige.href = viewUrl('corrige.html');
+    }
   }
 
   function wire() {
@@ -156,27 +148,6 @@
     });
     elPeriode.addEventListener('change', function () { state.periode = elPeriode.value; populateSemaine(); renderWeek(); });
     elSemaine.addEventListener('change', function () { state.semaine = elSemaine.value; renderWeek(); });
-
-    document.getElementById('btn-eleve-docx').addEventListener('click', function () {
-      var doc = window.IEP1ExportDocx.buildFicheEleveDocx(selectedInJours(), meta());
-      window.IEP1ExportDocx.downloadDocx(doc, 'Fiche_eleve_' + filenameBase() + '.docx');
-      elStatus.textContent = 'Fiche élève (.docx) téléchargée.';
-    });
-    document.getElementById('btn-corrige-docx').addEventListener('click', function () {
-      var doc = window.IEP1ExportDocx.buildCorrigeDocx(selectedInJours(), meta());
-      window.IEP1ExportDocx.downloadDocx(doc, 'Corrige_enseignant_' + filenameBase() + '.docx');
-      elStatus.textContent = 'Corrigé enseignant (.docx) téléchargé.';
-    });
-    document.getElementById('btn-eleve-pdf').addEventListener('click', function () {
-      var dd = window.IEP1ExportPdf.buildFicheElevePdf(selectedInJours(), meta());
-      window.IEP1ExportPdf.downloadPdf(dd, 'Fiche_eleve_' + filenameBase() + '.pdf');
-      elStatus.textContent = 'Fiche élève (.pdf) téléchargée.';
-    });
-    document.getElementById('btn-corrige-pdf').addEventListener('click', function () {
-      var dd = window.IEP1ExportPdf.buildCorrigePdf(selectedInJours(), meta());
-      window.IEP1ExportPdf.downloadPdf(dd, 'Corrige_enseignant_' + filenameBase() + '.pdf');
-      elStatus.textContent = 'Corrigé enseignant (.pdf) téléchargé.';
-    });
   }
 
   populateNiveau();

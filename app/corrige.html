@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="css/iep1.css">
 </head>
 <body>
-<div class="iep1-topbar">
+<div class="iep1-topbar no-print">
   <strong style="font-family:var(--font-display)">IEP1 — Deux challenges par jour</strong>
   <nav>
     <a href="accueil.html">Accueil</a>
@@ -15,12 +15,16 @@
   </nav>
 </div>
 <div class="iep1-shell">
-  <div class="iep1-banner">
+  <div class="iep1-banner no-print">
     <h1>Corrigé illustré</h1>
     <p>Aperçu à l'écran du corrigé enseignant, avec les schémas visuels par catégorie.</p>
   </div>
 
-  <div class="card">
+  <div class="print-toolbar no-print">
+    <button class="btn primary" id="btn-print">Imprimer / Enregistrer en PDF</button>
+  </div>
+
+  <div class="card no-print">
     <div class="field-row">
       <div class="field">
         <label for="sel-niveau">Niveau</label>
@@ -40,7 +44,7 @@
 
   <div id="jours"></div>
 </div>
-<footer class="iep1-footer">IEP1 — Inspection de l'Enseignement Primaire, circonscription 1 — Gouvernement de la Nouvelle-Calédonie</footer>
+<footer class="iep1-footer no-print">IEP1 — Inspection de l'Enseignement Primaire, circonscription 1 — Gouvernement de la Nouvelle-Calédonie</footer>
 
 <script src="data/cm1.js"></script>
 <script src="data/cm2.js"></script>

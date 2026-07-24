@@ -110,7 +110,7 @@ a:hover{color:var(--link-hover)}
 .btn.navy{background:var(--navy-900);color:var(--white)}
 .btn.navy:hover{background:var(--navy-800)}
 .btn.outline{background:transparent;color:var(--blue-deep);border:1px solid var(--blue-deep)}
-.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:disabled,.btn.disabled{opacity:.45;cursor:not-allowed;pointer-events:none}
 
 /* ===== Tableau des problèmes (sélection) ===== */
 table.problemes{width:100%;border-collapse:collapse;font-size:var(--fs-body)}
@@ -161,3 +161,54 @@ table.problemes td{padding:var(--space-2) var(--space-3);border-bottom:1px solid
 .statblock.orange .value{color:var(--orange-700)}
 
 footer.iep1-footer{color:var(--text-muted);font-size:var(--fs-caption);text-align:center;padding:var(--space-6) 0}
+
+/* ===== Impression / export PDF via le navigateur ===== */
+@page{size:A4 landscape;margin:1cm}
+@media print{
+  .no-print{display:none!important}
+  body{background:var(--white)}
+  .iep1-shell{width:100%;padding:0}
+  .print-sheet{page-break-after:always;break-after:page}
+  .print-sheet:last-child{page-break-after:auto;break-after:auto}
+  .card,.callout{box-shadow:none}
+}
+.print-toolbar{display:flex;gap:var(--space-3);align-items:center;margin-bottom:var(--space-5)}
+
+/* ===== Fiche élève imprimable : tableau par jour ===== */
+table.eleve-jour{width:100%;border-collapse:collapse;table-layout:fixed;margin-bottom:var(--space-4)}
+table.eleve-jour th,table.eleve-jour td{border:1px solid var(--border-subtle);padding:8px 12px;vertical-align:top;text-align:left}
+table.eleve-jour thead tr.jourhead th{color:var(--white);font-family:var(--font-display);font-weight:var(--fw-bold);font-size:var(--fs-h4);text-align:center;padding:8px}
+table.eleve-jour thead tr.subhead th{background:var(--paper);font-family:var(--font-display);font-weight:var(--fw-bold);font-size:var(--fs-small);color:var(--text-secondary)}
+table.eleve-jour td.col-num{width:22%;font-size:var(--fs-small)}
+table.eleve-jour td.col-num .n{font-family:var(--font-display);font-weight:var(--fw-bold);font-size:var(--fs-body-lg);margin-right:4px}
+table.eleve-jour td.col-write{width:26%;height:95px}
+table.eleve-jour--1 thead tr.jourhead th{background:var(--jour1)}
+table.eleve-jour--2 thead tr.jourhead th{background:var(--jour2)}
+table.eleve-jour--3 thead tr.jourhead th{background:var(--jour3)}
+table.eleve-jour--4 thead tr.jourhead th{background:var(--jour4)}
+
+.write-area{
+  background-image:
+    repeating-linear-gradient(to bottom,#8FB3D6 0,#8FB3D6 1px,transparent 1px,transparent 34px),
+    repeating-linear-gradient(to bottom,#D8E7F3 0,#D8E7F3 1px,transparent 1px,transparent 8.5px);
+  background-position:0 6px;
+}
+
+table.eleve-evalgrid{width:60%;border-collapse:collapse;margin:0 auto}
+table.eleve-evalgrid th,table.eleve-evalgrid td{border:1px solid var(--border-subtle);padding:6px 10px;text-align:center}
+table.eleve-evalgrid thead th{color:var(--white);font-family:var(--font-display);font-weight:var(--fw-bold)}
+table.eleve-evalgrid thead th.bilan{background:var(--navy-900)}
+.eleve-evalgrid__stars{color:var(--gray-300);font-size:16px;letter-spacing:2px}
+.eleve-evalgrid__legend{text-align:center;font-size:var(--fs-small);color:var(--text-secondary);margin-top:var(--space-2)}
+
+/* ===== Corrigé imprimable : compact pour tenir sur une page ===== */
+@media print{
+  .corrige-band{box-shadow:none;margin-bottom:6px;border-radius:0}
+  .corrige-band__badge{flex-basis:70px;padding:4px}
+  .corrige-band__badge .num{font-size:20px}
+  .corrige-band__enonce,.corrige-band__schema,.corrige-band__answer{padding:6px 10px}
+  .corrige-band__enonce{font-size:11px}
+  .corrige-band__answer .rep{font-size:14px}
+  .corrige-band__answer .expl{display:none}
+  .corrige-daylabel{margin:8px 0 4px;padding:4px 10px;font-size:12px}
+}

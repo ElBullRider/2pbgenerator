@@ -1,10 +1,10 @@
 /*
  * Schémas visuels par catégorie Vergnaud — un seul générateur de spec par
- * famille de catégories, puis 3 adaptateurs de sortie (écran/SVG, Word/docx,
- * PDF/pdfmake). Les valeurs viennent de `schema.known`/`schema.unknown`
- * (dérivées du premier pas de calcul) : le diagramme est une aide visuelle
- * générique, la méthode complète et exacte reste toujours affichée en texte
- * à côté (colonne "Calcul").
+ * famille de catégories, rendu en SVG (utilisé à l'écran et à l'impression,
+ * fiche-eleve.html / corrige.html). Les valeurs viennent de
+ * `schema.known`/`schema.unknown` (dérivées du premier pas de calcul) : le
+ * diagramme est une aide visuelle générique, la méthode complète et exacte
+ * reste toujours affichée en texte à côté (colonne "Calcul").
  */
 (function (global) {
   'use strict';
@@ -174,131 +174,10 @@
     }
   }
 
-  // ================= Rendu Word (docx.js) — tableau compact ==============
-  // `docx` = le module docx.js global (déjà chargé par lib/docx-bundle.js).
-  function docxCell(docx, txt, opts) {
-    opts = opts || {};
-    return new docx.TableCell({
-      width: { size: opts.width || 25, type: docx.WidthType.PERCENTAGE },
-      shading: opts.fill ? { fill: opts.fill } : undefined,
-      verticalAlign: docx.VerticalAlign.CENTER,
-      children: [new docx.Paragraph({
-        alignment: docx.AlignmentType.CENTER,
-        children: [new docx.TextRun({ text: String(txt), bold: !!opts.bold, color: opts.color || '0F2942', size: 18 })],
-      })],
-    });
-  }
-
-  function buildSchemaDocx(problem, docx) {
-    var spec = buildSpec(problem);
-    var rows = [];
-    if (spec.fam === 'partpart') {
-      var cells = spec.parts.map(function (p) { return docxCell(docx, p, { fill: 'E3F0F7' }); });
-      cells.push(docxCell(docx, spec.whole || spec.missing, { fill: 'F47A4B', color: 'FFFFFF', bold: true }));
-      rows.push(new docx.TableRow({ children: cells }));
-    } else if (spec.fam === 'transform') {
-      rows.push(new docx.TableRow({
-        children: [
-          docxCell(docx, spec.start, { fill: 'E3F0F7', bold: true }),
-          docxCell(docx, spec.op, { fill: 'FFFFFF' }),
-          docxCell(docx, spec.end, { fill: 'F47A4B', color: 'FFFFFF', bold: true }),
-        ],
-      }));
-    } else if (spec.fam === 'compare') {
-      rows.push(new docx.TableRow({
-        children: [
-          docxCell(docx, spec.a, { fill: 'E3F0F7', bold: true }),
-          docxCell(docx, spec.b, { fill: 'FDEAE6', bold: true }),
-          docxCell(docx, 'écart : ' + spec.diff, { fill: 'E7F5EA', bold: true, color: '24952E' }),
-        ],
-      }));
-    } else if (spec.fam === 'multdiv') {
-      rows.push(new docx.TableRow({
-        children: [
-          docxCell(docx, spec.a, { fill: 'E3F0F7', bold: true }),
-          docxCell(docx, spec.op, { fill: 'FFFFFF' }),
-          docxCell(docx, spec.b, { fill: 'E3F0F7', bold: true }),
-          docxCell(docx, '= ' + spec.result, { fill: 'F47A4B', color: 'FFFFFF', bold: true }),
-        ],
-      }));
-    } else {
-      rows.push(new docx.TableRow({
-        children: [docxCell(docx, spec.colA1, { fill: 'F7F9FB' }), docxCell(docx, spec.colB1, { fill: 'F7F9FB' })],
-      }));
-      rows.push(new docx.TableRow({
-        children: [docxCell(docx, spec.colA2, { fill: 'F7F9FB' }), docxCell(docx, spec.colB2 + ' (' + spec.factor + ')', { fill: 'F47A4B', color: 'FFFFFF', bold: true })],
-      }));
-    }
-    return new docx.Table({ width: { size: 100, type: docx.WidthType.PERCENTAGE }, rows: rows });
-  }
-
-  // ================= Rendu PDF (pdfmake) — table + canvas ================
-  function hexToPdf(hex) { return '#' + hex; }
-
-  function buildSchemaPdf(problem) {
-    var spec = buildSpec(problem);
-    if (spec.fam === 'partpart') {
-      var body = [spec.parts.map(function (p) {
-        return { text: String(p), fillColor: hexToPdf(COLOR.blueMid), color: 'white', bold: true, alignment: 'center', margin: [2, 4, 2, 4] };
-      })];
-      body[0].push({ text: String(spec.whole || spec.missing), fillColor: hexToPdf(COLOR.orange), color: 'white', bold: true, alignment: 'center', margin: [2, 4, 2, 4] });
-      return { table: { body: body }, layout: 'noBorders', fontSize: 9 };
-    }
-    if (spec.fam === 'transform') {
-      return {
-        table: {
-          widths: ['*', '*', '*'],
-          body: [[
-            { text: spec.start, fillColor: hexToPdf(COLOR.blueMid), color: 'white', bold: true, alignment: 'center' },
-            { text: spec.op, alignment: 'center', bold: true },
-            { text: spec.end, fillColor: hexToPdf(COLOR.orange), color: 'white', bold: true, alignment: 'center' },
-          ]],
-        }, layout: 'noBorders', fontSize: 9,
-      };
-    }
-    if (spec.fam === 'compare') {
-      return {
-        table: {
-          widths: ['*', '*', '*'],
-          body: [[
-            { text: spec.a, fillColor: hexToPdf(COLOR.blueMid), color: 'white', bold: true, alignment: 'center' },
-            { text: spec.b, fillColor: hexToPdf(COLOR.orange), color: 'white', bold: true, alignment: 'center' },
-            { text: 'écart : ' + spec.diff, fillColor: hexToPdf(COLOR.green), color: 'white', bold: true, alignment: 'center' },
-          ]],
-        }, layout: 'noBorders', fontSize: 9,
-      };
-    }
-    if (spec.fam === 'multdiv') {
-      return {
-        table: {
-          widths: ['*', '*', '*', '*'],
-          body: [[
-            { text: spec.a, fillColor: hexToPdf(COLOR.blueMid), color: 'white', bold: true, alignment: 'center' },
-            { text: spec.op, alignment: 'center' },
-            { text: spec.b, fillColor: hexToPdf(COLOR.blueMid), color: 'white', bold: true, alignment: 'center' },
-            { text: '= ' + spec.result, fillColor: hexToPdf(COLOR.orange), color: 'white', bold: true, alignment: 'center' },
-          ]],
-        }, layout: 'noBorders', fontSize: 9,
-      };
-    }
-    // prop
-    return {
-      table: {
-        widths: ['*', '*'],
-        body: [
-          [{ text: spec.colA1, alignment: 'center' }, { text: spec.colB1, alignment: 'center' }],
-          [{ text: spec.colA2, alignment: 'center' }, { text: spec.colB2 + ' (' + spec.factor + ')', fillColor: hexToPdf(COLOR.orange), color: 'white', bold: true, alignment: 'center' }],
-        ],
-      }, layout: 'lightHorizontalLines', fontSize: 9,
-    };
-  }
-
   global.IEP1Schemas = {
     FAMILY_BY_CAT: FAMILY_BY_CAT,
     buildSpec: buildSpec,
     buildSchemaSVG: buildSchemaSVG,
-    buildSchemaDocx: buildSchemaDocx,
-    buildSchemaPdf: buildSchemaPdf,
     COLOR: COLOR,
   };
 })(window);

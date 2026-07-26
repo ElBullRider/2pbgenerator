@@ -15,7 +15,7 @@
     { code: 'CM2', label: 'CM2', data: DATA_CM2, key: 'CM2', available: true },
     { code: 'CE2', label: 'CE2', data: null, key: 'CE2', available: false },
     { code: 'CE1', label: 'CE1', data: null, key: 'CE1', available: false },
-    { code: 'CP', label: 'CP', data: null, key: 'CP', available: false },
+    { code: 'CP', label: 'CP', data: DATA_CP, key: 'CP', available: true },
   ];
   var urlParams = new URLSearchParams(location.search);
   var urlSel = urlParams.get('sel');

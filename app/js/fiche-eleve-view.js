@@ -7,7 +7,7 @@
 (function () {
   'use strict';
   var catLabel = window.IEP1CatLabels.catLabel;
-  var DATA = { CM1: DATA_CM1, CM2: DATA_CM2 };
+  var DATA = { CM1: DATA_CM1, CM2: DATA_CM2, CP: DATA_CP };
 
   function escapeHtml(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
 

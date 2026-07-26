@@ -13,7 +13,7 @@
   var NIVEAUX = [
     { code: 'CM1', label: 'CM1', data: DATA_CM1, key: 'CM1', available: true },
     { code: 'CM2', label: 'CM2', data: DATA_CM2, key: 'CM2', available: true },
-    { code: 'CE2', label: 'CE2', data: null, key: 'CE2', available: false },
+    { code: 'CE2', label: 'CE2', data: DATA_CE2, key: 'CE2', available: true },
     { code: 'CE1', label: 'CE1', data: DATA_CE1, key: 'CE1', available: true },
     { code: 'CP', label: 'CP', data: DATA_CP, key: 'CP', available: true },
   ];

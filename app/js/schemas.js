@@ -14,7 +14,7 @@
     'EF+': 'transform', 'EF-': 'transform', 'EI+': 'transform', 'EI-': 'transform',
     'TR+': 'transform', 'TR-': 'transform', TT: 'transform',
     C: 'compare', CE: 'compare', 'C+': 'compare', 'C-': 'compare', 'CE+': 'compare', 'CE-': 'compare',
-    'CE+*': 'compare', 'CE-*': 'compare', CEx: 'compare', 'CEx*': 'compare',
+    'CE*': 'compare', 'CE+*': 'compare', 'CE-*': 'compare', CEx: 'compare', 'CEx*': 'compare',
     'Cx+': 'compare', 'Cx-': 'compare',
     MA: 'multdiv', MR: 'multdiv', DN: 'multdiv', DV: 'multdiv',
     Pro: 'prop', 'Pro+': 'prop', ProX: 'prop', ProU: 'prop',

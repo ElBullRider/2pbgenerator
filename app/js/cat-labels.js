@@ -18,6 +18,7 @@
     'C-': "Comparaison (−)",
     'CE+': "Comparaison — recherche d'un état (+)",
     'CE-': "Comparaison — recherche d'un état (−)",
+    'CE*': "Comparaison à traduire",
     'CE+*': "Comparaison à traduire (+)",
     'CE-*': "Comparaison à traduire (−)",
     'CEx*': "Comparaison multiplicative à traduire",

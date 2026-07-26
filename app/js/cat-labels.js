@@ -13,6 +13,7 @@
     'TR-': "Transformation — recherche de la transformation (−)",
     'TT': "Transformation — transformations composées",
     'C': "Comparaison — connaissant les 2 états",
+    'CE': "Comparaison — recherche d'un état",
     'C+': "Comparaison (+)",
     'C-': "Comparaison (−)",
     'CE+': "Comparaison — recherche d'un état (+)",

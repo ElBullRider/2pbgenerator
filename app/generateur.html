@@ -11,7 +11,7 @@
   <nav>
     <a href="accueil.html">Accueil</a>
     <a href="generateur.html" class="active">Générateur</a>
-    <a href="corrige.html">Corrigé illustré</a>
+    <a href="corrige.html" id="nav-corrige">Corrigé illustré</a>
     <a href="suivi.html">Suivi</a>
   </nav>
 </div>
@@ -22,11 +22,9 @@
   </div>
 
   <div class="card">
+    <label style="display:block;margin-bottom:6px;font-family:var(--font-display);font-weight:var(--fw-bold);font-size:var(--fs-small);color:var(--text-secondary)">Niveau</label>
+    <div id="niveau-pills" class="niveau-pills"></div>
     <div class="field-row">
-      <div class="field">
-        <label for="sel-niveau">Niveau</label>
-        <select id="sel-niveau"></select>
-      </div>
       <div class="field">
         <label for="sel-periode">Période</label>
         <select id="sel-periode"></select>

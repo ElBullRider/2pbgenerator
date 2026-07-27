@@ -265,3 +265,12 @@ table.suivi-grid input[type=number]{width:56px;padding:4px 6px;border:1px solid 
 .groupe-card h4{color:var(--white);margin-bottom:8px}
 .groupe-card ul{margin:0;padding-left:18px}
 .groupe-card li{margin-bottom:2px}
+
+/* ===== Sélecteur de niveau en bulles (onglets) ===== */
+.niveau-pills{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:var(--space-4)}
+.niveau-pill{padding:9px 22px;border-radius:var(--radius-pill);border:2px solid var(--blue-deep);
+  background:var(--white);color:var(--blue-deep);font-family:var(--font-display);font-weight:var(--fw-bold);
+  font-size:var(--fs-body);cursor:pointer;transition:background .15s,color .15s}
+.niveau-pill:hover{background:var(--blue-mid);color:var(--white);border-color:var(--blue-mid)}
+.niveau-pill.active{background:var(--blue-deep);color:var(--white)}
+.niveau-pill:disabled{opacity:.4;cursor:not-allowed}

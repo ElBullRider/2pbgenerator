@@ -10,7 +10,7 @@
   <strong style="font-family:var(--font-display)">IEP1 — Deux challenges par jour</strong>
   <nav>
     <a href="accueil.html">Accueil</a>
-    <a href="generateur.html">Générateur</a>
+    <a href="generateur.html" id="nav-generateur">Générateur</a>
     <a href="corrige.html" class="active">Corrigé illustré</a>
     <a href="suivi.html">Suivi</a>
   </nav>
@@ -23,15 +23,13 @@
 
   <div class="print-toolbar no-print">
     <button class="btn primary" id="btn-print">Imprimer / Enregistrer en PDF</button>
-    <a class="btn outline" href="generateur.html">← Retour au générateur</a>
+    <a class="btn outline" href="generateur.html" id="btn-retour-generateur">← Retour au générateur</a>
   </div>
 
   <div class="card no-print">
+    <label style="display:block;margin-bottom:6px;font-family:var(--font-display);font-weight:var(--fw-bold);font-size:var(--fs-small);color:var(--text-secondary)">Niveau</label>
+    <div id="niveau-pills" class="niveau-pills"></div>
     <div class="field-row">
-      <div class="field">
-        <label for="sel-niveau">Niveau</label>
-        <select id="sel-niveau"></select>
-      </div>
       <div class="field">
         <label for="sel-periode">Période</label>
         <select id="sel-periode"></select>

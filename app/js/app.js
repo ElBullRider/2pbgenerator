@@ -1,21 +1,23 @@
 /* Logique UI de la page générateur : sélection niveau/période/semaine,
  * verrouillage à 8 problèmes, mise à jour des liens vers les vues
- * imprimables (fiche-eleve.html / corrige.html). */
+ * imprimables (fiche-eleve.html / corrige.html) et vers le corrigé. */
 (function () {
   'use strict';
   var catLabel = window.IEP1CatLabels.catLabel;
 
   var NIVEAUX = [
-    { code: 'CM1', label: 'CM1', data: DATA_CM1, key: 'CM1', available: true },
-    { code: 'CM2', label: 'CM2', data: DATA_CM2, key: 'CM2', available: true },
-    { code: 'CE2', label: 'CE2', data: DATA_CE2, key: 'CE2', available: true },
-    { code: 'CE1', label: 'CE1', data: DATA_CE1, key: 'CE1', available: true },
-    { code: 'CP', label: 'CP', data: DATA_CP, key: 'CP', available: true },
+    { code: 'CP', label: 'CP', data: DATA_CP, key: 'CP' },
+    { code: 'CE1', label: 'CE1', data: DATA_CE1, key: 'CE1' },
+    { code: 'CE2', label: 'CE2', data: DATA_CE2, key: 'CE2' },
+    { code: 'CM1', label: 'CM1', data: DATA_CM1, key: 'CM1' },
+    { code: 'CM2', label: 'CM2', data: DATA_CM2, key: 'CM2' },
   ];
 
-  var state = { niveau: NIVEAUX[0], periode: null, semaine: null, selected: new Set() };
+  var urlParams = new URLSearchParams(location.search);
+  var initialNiveau = NIVEAUX.filter(function (n) { return n.code === urlParams.get('niveau'); })[0] || NIVEAUX[0];
+  var state = { niveau: initialNiveau, periode: null, semaine: null, selected: new Set() };
 
-  var elNiveau = document.getElementById('sel-niveau');
+  var elNiveauPills = document.getElementById('niveau-pills');
   var elPeriode = document.getElementById('sel-periode');
   var elSemaine = document.getElementById('sel-semaine');
   var elRefBox = document.getElementById('ref-box');
@@ -23,6 +25,7 @@
   var elLockMsg = document.getElementById('lock-msg');
   var elLnkEleve = document.getElementById('lnk-eleve');
   var elLnkCorrige = document.getElementById('lnk-corrige');
+  var elNavCorrige = document.getElementById('nav-corrige');
 
   function currentWeek() {
     if (!state.niveau.data || !state.periode || !state.semaine) return null;
@@ -35,27 +38,35 @@
   }
 
   function populateNiveau() {
-    elNiveau.innerHTML = '';
+    elNiveauPills.innerHTML = '';
     NIVEAUX.forEach(function (n) {
-      var opt = document.createElement('option');
-      opt.value = n.code;
-      opt.textContent = n.available ? n.label : n.label + ' (bientôt disponible)';
-      opt.disabled = !n.available;
-      elNiveau.appendChild(opt);
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'niveau-pill' + (n.code === state.niveau.code ? ' active' : '');
+      btn.textContent = n.label;
+      btn.addEventListener('click', function () {
+        if (state.niveau.code === n.code) return;
+        state.niveau = n;
+        populateNiveau();
+        populatePeriode(); populateSemaine(); renderWeek();
+      });
+      elNiveauPills.appendChild(btn);
     });
-    elNiveau.value = state.niveau.code;
   }
 
   function populatePeriode() {
     elPeriode.innerHTML = '';
     var data = state.niveau.data || {};
+    var wanted = urlParams.get('periode');
     Object.keys(data).sort().forEach(function (p) {
       var opt = document.createElement('option');
       opt.value = p;
       opt.textContent = 'Période ' + p.replace('P', '');
       elPeriode.appendChild(opt);
     });
-    state.periode = elPeriode.value || Object.keys(data)[0];
+    state.periode = (wanted && data[wanted]) ? wanted : (elPeriode.value || Object.keys(data)[0]);
+    elPeriode.value = state.periode;
+    urlParams.delete('periode');
   }
 
   function populateSemaine() {
@@ -64,13 +75,16 @@
     var weeks = Object.keys(data[state.periode] || {}).sort(function (a, b) {
       return parseInt(a.replace('S', '')) - parseInt(b.replace('S', ''));
     });
+    var wanted = urlParams.get('semaine');
     weeks.forEach(function (s) {
       var opt = document.createElement('option');
       opt.value = s;
       opt.textContent = 'Semaine ' + s.replace('S', '');
       elSemaine.appendChild(opt);
     });
-    state.semaine = elSemaine.value || weeks[0];
+    state.semaine = (wanted && weeks.indexOf(wanted) !== -1) ? wanted : (elSemaine.value || weeks[0]);
+    elSemaine.value = state.semaine;
+    urlParams.delete('semaine');
   }
 
   function defaultSelection(problems) {
@@ -89,6 +103,7 @@
     defaultSelection(problems);
     renderTable(problems);
     renderLockState();
+    updateNavCorrige();
   }
 
   function escapeHtml(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
@@ -128,6 +143,16 @@
     return page + '?' + qs.toString();
   }
 
+  // Garde le lien de nav "Corrigé illustré" sur le même niveau/période/semaine.
+  function updateNavCorrige() {
+    if (!elNavCorrige || !state.periode || !state.semaine) return;
+    var qs = new URLSearchParams();
+    qs.set('niveau', state.niveau.code);
+    qs.set('periode', state.periode);
+    qs.set('semaine', state.semaine);
+    elNavCorrige.href = 'corrige.html?' + qs.toString();
+  }
+
   function renderLockState() {
     var n = state.selected.size;
     var ok = n === 8;
@@ -142,10 +167,6 @@
   }
 
   function wire() {
-    elNiveau.addEventListener('change', function () {
-      state.niveau = NIVEAUX.filter(function (n) { return n.code === elNiveau.value; })[0];
-      populatePeriode(); populateSemaine(); renderWeek();
-    });
     elPeriode.addEventListener('change', function () { state.periode = elPeriode.value; populateSemaine(); renderWeek(); });
     elSemaine.addEventListener('change', function () { state.semaine = elSemaine.value; renderWeek(); });
   }

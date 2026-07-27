@@ -11,23 +11,25 @@
   var buildSchemaSVG = window.IEP1Schemas.buildSchemaSVG;
 
   var NIVEAUX = [
-    { code: 'CM1', label: 'CM1', data: DATA_CM1, key: 'CM1', available: true },
-    { code: 'CM2', label: 'CM2', data: DATA_CM2, key: 'CM2', available: true },
-    { code: 'CE2', label: 'CE2', data: DATA_CE2, key: 'CE2', available: true },
-    { code: 'CE1', label: 'CE1', data: DATA_CE1, key: 'CE1', available: true },
-    { code: 'CP', label: 'CP', data: DATA_CP, key: 'CP', available: true },
+    { code: 'CP', label: 'CP', data: DATA_CP, key: 'CP' },
+    { code: 'CE1', label: 'CE1', data: DATA_CE1, key: 'CE1' },
+    { code: 'CE2', label: 'CE2', data: DATA_CE2, key: 'CE2' },
+    { code: 'CM1', label: 'CM1', data: DATA_CM1, key: 'CM1' },
+    { code: 'CM2', label: 'CM2', data: DATA_CM2, key: 'CM2' },
   ];
   var urlParams = new URLSearchParams(location.search);
   var urlSel = urlParams.get('sel');
-  var state = { niveau: NIVEAUX[0], periode: null, semaine: null };
+  var state = { niveau: NIVEAUX.filter(function (n) { return n.code === urlParams.get('niveau'); })[0] || NIVEAUX[0], periode: null, semaine: null };
 
-  var elNiveau = document.getElementById('sel-niveau');
+  var elNiveauPills = document.getElementById('niveau-pills');
   var elPeriode = document.getElementById('sel-periode');
   var elSemaine = document.getElementById('sel-semaine');
   var elRefBox = document.getElementById('ref-box');
   var elJours = document.getElementById('jours');
   var elPrintBtn = document.getElementById('btn-print');
   var elPrintBanner = document.getElementById('print-banner');
+  var elNavGenerateur = document.getElementById('nav-generateur');
+  var elBtnRetour = document.getElementById('btn-retour-generateur');
 
   function escapeHtml(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
 
@@ -38,17 +40,20 @@
   }
 
   function populateNiveau() {
-    elNiveau.innerHTML = '';
+    elNiveauPills.innerHTML = '';
     NIVEAUX.forEach(function (n) {
-      var opt = document.createElement('option');
-      opt.value = n.code;
-      opt.textContent = n.available ? n.label : n.label + ' (bientôt disponible)';
-      opt.disabled = !n.available;
-      elNiveau.appendChild(opt);
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'niveau-pill' + (n.code === state.niveau.code ? ' active' : '');
+      btn.textContent = n.label;
+      btn.addEventListener('click', function () {
+        if (state.niveau.code === n.code) return;
+        state.niveau = n;
+        populateNiveau();
+        populatePeriode(); populateSemaine(); render();
+      });
+      elNiveauPills.appendChild(btn);
     });
-    var fromUrl = NIVEAUX.filter(function (n) { return n.code === urlParams.get('niveau') && n.available; })[0];
-    state.niveau = fromUrl || state.niveau;
-    elNiveau.value = state.niveau.code;
   }
   function populatePeriode() {
     elPeriode.innerHTML = '';
@@ -61,6 +66,7 @@
     var wanted = urlParams.get('periode');
     state.periode = (wanted && data[wanted]) ? wanted : (elPeriode.value || Object.keys(data)[0]);
     elPeriode.value = state.periode;
+    urlParams.delete('periode');
   }
   function populateSemaine() {
     elSemaine.innerHTML = '';
@@ -76,6 +82,19 @@
     var wanted = urlParams.get('semaine');
     state.semaine = (wanted && weeks.indexOf(wanted) !== -1) ? wanted : (elSemaine.value || weeks[0]);
     elSemaine.value = state.semaine;
+    urlParams.delete('semaine');
+  }
+
+  // Garde les liens vers le générateur sur le même niveau/période/semaine.
+  function updateNavGenerateur() {
+    if (!state.periode || !state.semaine) return;
+    var qs = new URLSearchParams();
+    qs.set('niveau', state.niveau.code);
+    qs.set('periode', state.periode);
+    qs.set('semaine', state.semaine);
+    var url = 'generateur.html?' + qs.toString();
+    if (elNavGenerateur) elNavGenerateur.href = url;
+    if (elBtnRetour) elBtnRetour.href = url;
   }
 
   function selectedInJours(problems, selParam) {
@@ -111,6 +130,7 @@
     elRefBox.innerHTML = week ? '<p style="margin-top:12px"><span class="tag tone-navy">Semaine</span> &nbsp;' + escapeHtml(week.ref) + '</p>' : '';
     elPrintBanner.innerHTML = week ? bannerHtml(week) : '';
     elJours.innerHTML = '';
+    updateNavGenerateur();
     if (!week) return;
     var problems = week[state.niveau.key];
     var html = '';
@@ -135,10 +155,6 @@
   }
 
   function wire() {
-    elNiveau.addEventListener('change', function () {
-      state.niveau = NIVEAUX.filter(function (n) { return n.code === elNiveau.value; })[0];
-      populatePeriode(); populateSemaine(); render();
-    });
     elPeriode.addEventListener('change', function () { state.periode = elPeriode.value; populateSemaine(); render(); });
     elSemaine.addEventListener('change', function () { state.semaine = elSemaine.value; render(); });
     if (elPrintBtn) elPrintBtn.addEventListener('click', function () { window.print(); });

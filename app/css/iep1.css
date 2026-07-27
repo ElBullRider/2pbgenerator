@@ -218,3 +218,50 @@ table.eleve-evalgrid thead th.bilan{background:var(--navy-900)}
   .corrige-band__answer .expl{display:none}
   .corrige-daylabel{margin:8px 0 4px;padding:4px 10px;font-size:12px}
 }
+
+/* ===== Suivi des élèves ===== */
+.suivi-tabs{display:flex;gap:var(--space-2);margin-bottom:var(--space-5);border-bottom:2px solid var(--border-subtle)}
+.suivi-tab{background:none;border:none;padding:10px 18px;font-family:var(--font-display);font-weight:var(--fw-bold);
+  font-size:var(--fs-body);color:var(--text-secondary);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px}
+.suivi-tab.active{color:var(--blue-deep);border-bottom-color:var(--blue-deep)}
+.suivi-panel{display:none}
+.suivi-panel.active{display:block}
+
+.eleves-manage{display:flex;gap:var(--space-2);align-items:center;flex-wrap:wrap;margin-bottom:var(--space-4)}
+.eleves-manage input[type=text]{padding:8px 12px;border:1px solid var(--border-subtle);border-radius:var(--radius-sm);font-size:var(--fs-body)}
+.eleve-chip{display:inline-flex;align-items:center;gap:6px;background:var(--paper);border-radius:var(--radius-pill);
+  padding:4px 6px 4px 12px;font-size:var(--fs-small)}
+.eleve-chip button{background:none;border:none;color:var(--gray-500);cursor:pointer;font-size:14px;line-height:1;padding:2px 4px}
+.eleve-chip button:hover{color:var(--orange-700)}
+
+table.suivi-grid{width:100%;border-collapse:collapse;font-size:var(--fs-small)}
+table.suivi-grid th,table.suivi-grid td{border:1px solid var(--border-subtle);padding:8px 10px;text-align:left;vertical-align:middle}
+table.suivi-grid th{background:var(--paper);font-family:var(--font-display);font-weight:var(--fw-bold)}
+table.suivi-grid input[type=number]{width:56px;padding:4px 6px;border:1px solid var(--border-subtle);border-radius:var(--radius-sm)}
+.suivi-detail-toggle{background:none;border:1px solid var(--border-subtle);border-radius:var(--radius-sm);
+  padding:4px 10px;font-size:var(--fs-caption);cursor:pointer;color:var(--text-secondary)}
+.suivi-detail-toggle.open{background:var(--blue-deep);color:var(--white);border-color:var(--blue-deep)}
+.suivi-detail-row td{background:var(--paper)}
+.suivi-detail-grid{display:flex;gap:8px;flex-wrap:wrap}
+.suivi-detail-item{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:var(--fs-caption);
+  background:var(--white);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);padding:4px 8px;min-width:64px}
+
+/* barres de progression */
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.bar-label{flex:0 0 220px;font-size:var(--fs-small)}
+.bar-track{flex:1;height:14px;background:var(--ink-100);border-radius:var(--radius-pill);overflow:hidden}
+.bar-fill{height:100%;background:var(--blue-deep);border-radius:var(--radius-pill)}
+.bar-fill.low{background:var(--orange-700)}
+.bar-fill.mid{background:var(--gold)}
+.bar-fill.high{background:var(--green-700)}
+.bar-value{flex:0 0 70px;text-align:right;font-size:var(--fs-small);font-family:var(--font-display);font-weight:var(--fw-bold)}
+
+/* groupes de travail */
+.groupes-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:var(--space-4);margin-top:var(--space-4)}
+.groupe-card{border-radius:var(--radius-md);padding:var(--space-4);color:var(--white)}
+.groupe-card.renforcement{background:var(--orange-700)}
+.groupe-card.consolidation{background:var(--blue-deep)}
+.groupe-card.autonomie{background:var(--green-700)}
+.groupe-card h4{color:var(--white);margin-bottom:8px}
+.groupe-card ul{margin:0;padding-left:18px}
+.groupe-card li{margin-bottom:2px}

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Suivi des élèves — Deux challenges par jour</title>
+<link rel="stylesheet" href="css/iep1.css">
+</head>
+<body>
+<div class="iep1-topbar">
+  <strong style="font-family:var(--font-display)">IEP1 — Deux challenges par jour</strong>
+  <nav>
+    <a href="accueil.html">Accueil</a>
+    <a href="generateur.html">Générateur</a>
+    <a href="corrige.html">Corrigé illustré</a>
+    <a href="suivi.html" class="active">Suivi</a>
+  </nav>
+</div>
+<div class="iep1-shell">
+  <div class="iep1-banner">
+    <h1>Suivi des élèves</h1>
+    <p>Saisie des résultats semaine par semaine, évolution par élève ou par classe, propositions de groupes de travail — tout est enregistré uniquement sur cet ordinateur (aucune donnée envoyée nulle part).</p>
+  </div>
+
+  <div class="suivi-tabs">
+    <button class="suivi-tab active" data-tab="saisie">Saisie</button>
+    <button class="suivi-tab" data-tab="eleve">Élève</button>
+    <button class="suivi-tab" data-tab="classe">Classe &amp; groupes</button>
+  </div>
+
+  <!-- ===== Onglet Saisie ===== -->
+  <div class="suivi-panel active" id="panel-saisie">
+    <div class="card">
+      <h3 style="margin-bottom:10px">Élèves de la classe</h3>
+      <div class="eleves-manage">
+        <input type="text" id="inp-nouvel-eleve" placeholder="Nom de l'élève">
+        <button class="btn primary" id="btn-ajouter-eleve">Ajouter</button>
+      </div>
+      <div id="liste-eleves" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+    </div>
+
+    <div class="card">
+      <div class="field-row">
+        <div class="field">
+          <label for="saisie-niveau">Niveau</label>
+          <select id="saisie-niveau"></select>
+        </div>
+        <div class="field">
+          <label for="saisie-periode">Période</label>
+          <select id="saisie-periode"></select>
+        </div>
+        <div class="field">
+          <label for="saisie-semaine">Semaine</label>
+          <select id="saisie-semaine"></select>
+        </div>
+      </div>
+      <div id="saisie-grid-container"></div>
+      <div style="margin-top:12px">
+        <button class="btn primary" id="btn-enregistrer-saisie">Enregistrer les résultats de la semaine</button>
+        <span id="saisie-status" style="margin-left:10px;color:var(--text-secondary);font-size:var(--fs-small)"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Onglet Élève ===== -->
+  <div class="suivi-panel" id="panel-eleve">
+    <div class="card">
+      <div class="field-row">
+        <div class="field">
+          <label for="ev-eleve">Élève</label>
+          <select id="ev-eleve"></select>
+        </div>
+        <div class="field">
+          <label for="ev-niveau">Niveau</label>
+          <select id="ev-niveau"></select>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:12px">Évolution par semaine</h3>
+      <div id="ev-semaines"></div>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:12px">Évolution par type de problème</h3>
+      <div id="ev-categories"></div>
+    </div>
+  </div>
+
+  <!-- ===== Onglet Classe & groupes ===== -->
+  <div class="suivi-panel" id="panel-classe">
+    <div class="card">
+      <h3 style="margin-bottom:10px">Groupes</h3>
+      <div class="eleves-manage">
+        <input type="text" id="inp-nouveau-groupe" placeholder="Nom du groupe">
+        <button class="btn primary" id="btn-ajouter-groupe">Créer un groupe</button>
+      </div>
+      <div id="gestion-groupes"></div>
+    </div>
+
+    <div class="card">
+      <div class="field-row">
+        <div class="field">
+          <label for="cl-selection">Voir</label>
+          <select id="cl-selection"></select>
+        </div>
+        <div class="field">
+          <label for="cl-niveau">Niveau</label>
+          <select id="cl-niveau"></select>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:12px">Évolution par semaine (moyenne)</h3>
+      <div id="cl-semaines"></div>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:12px">Évolution par type de problème (moyenne)</h3>
+      <div id="cl-categories"></div>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:6px">Proposer des groupes de travail</h3>
+      <div class="field-row">
+        <div class="field">
+          <label for="cl-groupes-cat">D'après la catégorie</label>
+          <select id="cl-groupes-cat"></select>
+        </div>
+      </div>
+      <div id="cl-groupes-resultat"></div>
+    </div>
+  </div>
+</div>
+<footer class="iep1-footer">IEP1 — Inspection de l'Enseignement Primaire, circonscription 1 — Gouvernement de la Nouvelle-Calédonie</footer>
+
+<script src="data/cm1.js"></script>
+<script src="data/cm2.js"></script>
+<script src="data/cp.js"></script>
+<script src="data/ce1.js"></script>
+<script src="data/ce2.js"></script>
+<script src="js/cat-labels.js"></script>
+<script src="js/suivi-store.js"></script>
+<script src="js/suivi-view.js"></script>
+</body>
+</html>

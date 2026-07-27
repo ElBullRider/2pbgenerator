@@ -18,13 +18,25 @@
 <div class="iep1-shell">
   <div class="iep1-banner">
     <h1>Suivi des élèves</h1>
-    <p>Saisie des résultats semaine par semaine, évolution par élève ou par classe, propositions de groupes de travail — tout est enregistré uniquement sur cet ordinateur (aucune donnée envoyée nulle part).</p>
+    <p>Saisie des résultats semaine par semaine, évolution par élève ou par classe, classement par type de problème pour repérer les groupes de besoin — tout est enregistré uniquement sur cet ordinateur (aucune donnée envoyée nulle part).</p>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-bottom:10px">Classe</h3>
+    <div class="classe-bar">
+      <select id="classe-select"></select>
+      <button class="btn outline" id="btn-supprimer-classe">Supprimer cette classe</button>
+    </div>
+    <div class="eleves-manage" style="margin-top:12px">
+      <input type="text" id="inp-nouvelle-classe" placeholder="Nom de la nouvelle classe">
+      <button class="btn primary" id="btn-ajouter-classe">Créer une classe</button>
+    </div>
   </div>
 
   <div class="suivi-tabs">
     <button class="suivi-tab active" data-tab="saisie">Saisie</button>
     <button class="suivi-tab" data-tab="eleve">Élève</button>
-    <button class="suivi-tab" data-tab="classe">Classe &amp; groupes</button>
+    <button class="suivi-tab" data-tab="classe">Classe &amp; classement</button>
   </div>
 
   <!-- ===== Onglet Saisie ===== -->
@@ -34,6 +46,10 @@
       <div class="eleves-manage">
         <input type="text" id="inp-nouvel-eleve" placeholder="Nom de l'élève">
         <button class="btn primary" id="btn-ajouter-eleve">Ajouter</button>
+      </div>
+      <div class="eleves-bulk">
+        <textarea id="inp-liste-eleves" rows="3" placeholder="Ou coller une liste d'élèves (un nom par ligne)"></textarea>
+        <button class="btn outline" id="btn-ajouter-liste">Ajouter la liste</button>
       </div>
       <div id="liste-eleves" style="display:flex;gap:8px;flex-wrap:wrap"></div>
     </div>
@@ -85,23 +101,10 @@
     </div>
   </div>
 
-  <!-- ===== Onglet Classe & groupes ===== -->
+  <!-- ===== Onglet Classe & classement ===== -->
   <div class="suivi-panel" id="panel-classe">
     <div class="card">
-      <h3 style="margin-bottom:10px">Groupes</h3>
-      <div class="eleves-manage">
-        <input type="text" id="inp-nouveau-groupe" placeholder="Nom du groupe">
-        <button class="btn primary" id="btn-ajouter-groupe">Créer un groupe</button>
-      </div>
-      <div id="gestion-groupes"></div>
-    </div>
-
-    <div class="card">
       <div class="field-row">
-        <div class="field">
-          <label for="cl-selection">Voir</label>
-          <select id="cl-selection"></select>
-        </div>
         <div class="field">
           <label for="cl-niveau">Niveau</label>
           <select id="cl-niveau"></select>
@@ -109,22 +112,26 @@
       </div>
     </div>
     <div class="card">
-      <h3 style="margin-bottom:12px">Évolution par semaine (moyenne)</h3>
+      <h3 style="margin-bottom:12px">Évolution par semaine (moyenne de la classe)</h3>
       <div id="cl-semaines"></div>
     </div>
     <div class="card">
-      <h3 style="margin-bottom:12px">Évolution par type de problème (moyenne)</h3>
+      <h3 style="margin-bottom:12px">Évolution par type de problème (moyenne de la classe)</h3>
       <div id="cl-categories"></div>
     </div>
     <div class="card">
-      <h3 style="margin-bottom:6px">Proposer des groupes de travail</h3>
+      <h3 style="margin-bottom:12px">Classement des élèves par type de problème</h3>
       <div class="field-row">
         <div class="field">
-          <label for="cl-groupes-cat">D'après la catégorie</label>
-          <select id="cl-groupes-cat"></select>
+          <label for="cl-classement-cat">Catégorie</label>
+          <select id="cl-classement-cat"></select>
         </div>
       </div>
-      <div id="cl-groupes-resultat"></div>
+      <div class="classement-toolbar">
+        <span></span>
+        <button class="btn outline" id="btn-classement-sens" style="padding:6px 14px">⇅ Meilleurs en premier</button>
+      </div>
+      <div id="cl-classement"></div>
     </div>
   </div>
 </div>

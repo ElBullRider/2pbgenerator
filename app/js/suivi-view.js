@@ -1,4 +1,4 @@
-/* Logique des 3 onglets de suivi.html : Saisie / Élève / Classe & groupes. */
+/* Logique de suivi.html : sélecteur de classe + 3 onglets (Saisie / Élève / Classe & classement). */
 (function () {
   'use strict';
   var store = window.IEP1Suivi;
@@ -6,15 +6,18 @@
   var data = store.load();
 
   var NIVEAUX = [
-    { code: 'CM1', label: 'CM1', data: DATA_CM1, key: 'CM1' },
-    { code: 'CM2', label: 'CM2', data: DATA_CM2, key: 'CM2' },
     { code: 'CP', label: 'CP', data: DATA_CP, key: 'CP' },
     { code: 'CE1', label: 'CE1', data: DATA_CE1, key: 'CE1' },
     { code: 'CE2', label: 'CE2', data: DATA_CE2, key: 'CE2' },
+    { code: 'CM1', label: 'CM1', data: DATA_CM1, key: 'CM1' },
+    { code: 'CM2', label: 'CM2', data: DATA_CM2, key: 'CM2' },
   ];
 
   function escapeHtml(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
   function niveauByCode(code) { return NIVEAUX.filter(function (n) { return n.code === code; })[0] || NIVEAUX[0]; }
+  function currentEleves() { return store.elevesForClasse(data, data.classeActive); }
+  function currentEleveIds() { return currentEleves().map(function (e) { return e.id; }); }
+  function eleveName(id) { var e = data.eleves.filter(function (e) { return e.id === id; })[0]; return e ? e.nom : '?'; }
 
   function fillNiveauSelect(el) {
     el.innerHTML = '';
@@ -52,10 +55,58 @@
 
   function pctClass(pct) { return pct < 50 ? 'low' : pct < 80 ? 'mid' : 'high'; }
 
-  // ===================== Onglet : gestion des élèves (partagé) ==========
+  function barRow(label, pct, valueText) {
+    return '<div class="bar-row"><div class="bar-label">' + escapeHtml(label) + '</div>' +
+      '<div class="bar-track"><div class="bar-fill ' + pctClass(pct) + '" style="width:' + Math.max(0, Math.min(100, pct)) + '%"></div></div>' +
+      '<div class="bar-value">' + escapeHtml(valueText) + '</div></div>';
+  }
+
+  // ===================== Classe active (sélecteur global) ==================
+  var elClasseSelect = document.getElementById('classe-select');
+
+  function populateClasseSelect() {
+    elClasseSelect.innerHTML = data.classes.map(function (c) {
+      return '<option value="' + c.id + '"' + (c.id === data.classeActive ? ' selected' : '') + '>' + escapeHtml(c.nom) + '</option>';
+    }).join('');
+  }
+
+  function refreshAllForClasse() {
+    renderListeEleves();
+    renderSaisieGrid();
+    populateEleveSelectors();
+    renderEleveTab();
+    renderClasseTab();
+  }
+
+  elClasseSelect.addEventListener('change', function () {
+    store.setClasseActive(data, elClasseSelect.value);
+    refreshAllForClasse();
+  });
+
+  document.getElementById('btn-ajouter-classe').addEventListener('click', function () {
+    var inp = document.getElementById('inp-nouvelle-classe');
+    var nom = inp.value.trim();
+    if (!nom) return;
+    store.addClasse(data, nom);
+    inp.value = '';
+    populateClasseSelect();
+    refreshAllForClasse();
+  });
+
+  document.getElementById('btn-supprimer-classe').addEventListener('click', function () {
+    var c = data.classes.filter(function (c) { return c.id === data.classeActive; })[0];
+    if (!c) return;
+    if (!window.confirm('Supprimer la classe "' + c.nom + '" et tous ses élèves/résultats ?')) return;
+    store.removeClasse(data, data.classeActive);
+    populateClasseSelect();
+    refreshAllForClasse();
+  });
+
+  // ===================== Gestion des élèves (onglet Saisie) ===============
   function renderListeEleves() {
     var el = document.getElementById('liste-eleves');
-    el.innerHTML = data.eleves.map(function (e) {
+    var eleves = currentEleves();
+    el.innerHTML = eleves.map(function (e) {
       return '<span class="eleve-chip">' + escapeHtml(e.nom) + '<button data-id="' + e.id + '" title="Supprimer">✕</button></span>';
     }).join('') || '<p style="color:var(--text-secondary);font-size:var(--fs-small)">Aucun élève pour le moment.</p>';
     el.querySelectorAll('button[data-id]').forEach(function (btn) {
@@ -72,8 +123,18 @@
     var inp = document.getElementById('inp-nouvel-eleve');
     var nom = inp.value.trim();
     if (!nom) return;
-    store.addEleve(data, nom);
+    store.addEleve(data, data.classeActive, nom);
     inp.value = '';
+    renderListeEleves();
+    renderSaisieGrid();
+    populateEleveSelectors();
+  });
+
+  document.getElementById('btn-ajouter-liste').addEventListener('click', function () {
+    var ta = document.getElementById('inp-liste-eleves');
+    if (!ta.value.trim()) return;
+    store.addElevesBulk(data, data.classeActive, ta.value);
+    ta.value = '';
     renderListeEleves();
     renderSaisieGrid();
     populateEleveSelectors();
@@ -107,7 +168,8 @@
   function renderSaisieGrid() {
     var container = document.getElementById('saisie-grid-container');
     var problems = huit(saisieState.niveau, saisieState.periode, saisieState.semaine);
-    if (!data.eleves.length) {
+    var eleves = currentEleves();
+    if (!eleves.length) {
       container.innerHTML = '<p style="color:var(--text-secondary);font-size:var(--fs-small)">Ajoutez des élèves ci-dessus pour commencer la saisie.</p>';
       return;
     }
@@ -115,40 +177,38 @@
       container.innerHTML = '<p style="color:var(--text-secondary);font-size:var(--fs-small)">Aucune donnée pour cette semaine.</p>';
       return;
     }
-    var rows = data.eleves.map(function (e) {
+    var rows = eleves.map(function (e) {
       var existing = store.getResultat(data, e.id, saisieState.niveau.code, saisieState.periode, saisieState.semaine);
-      var score = existing ? existing.score : '';
+      var score = existing ? existing.score : 8;
       var checks = problems.map(function (p, i) {
-        var checked = existing && existing.detail ? existing.detail[i].correct : true;
+        var checked = existing && existing.detail ? existing.detail[i].correct : (i < score);
         return '<label class="suivi-detail-item"><input type="checkbox" data-idx="' + i + '"' + (checked ? ' checked' : '') + '>' +
           '<span>J' + (Math.floor(i / 2) + 1) + '.' + (i % 2 + 1) + '</span><span title="' + escapeHtml(catLabel(p.cat)) + '">' + escapeHtml(p.cat) + '</span></label>';
       }).join('');
       return '<tr data-eleve-id="' + e.id + '">' +
         '<td>' + escapeHtml(e.nom) + '</td>' +
         '<td><input type="number" class="note-input" min="0" max="8" value="' + score + '"></td>' +
-        '<td><button type="button" class="suivi-detail-toggle' + (existing && existing.detail ? ' has-detail' : '') + '">Détail ▾</button></td>' +
-        '</tr>' +
-        '<tr class="suivi-detail-row" style="display:none"><td colspan="3"><div class="suivi-detail-grid">' + checks + '</div></td></tr>';
+        '<td><div class="suivi-detail-grid">' + checks + '</div></td>' +
+        '</tr>';
     }).join('');
     container.innerHTML = '<p style="margin-bottom:10px;color:var(--text-secondary);font-size:var(--fs-small)">' +
-      'Basé sur les 8 problèmes de base de la semaine (hors bonus). Note /8 rapide, ou "Détail" pour cocher/décocher chaque problème.</p>' +
+      'Note /8 à gauche, détail par problème à droite — les deux se mettent à jour automatiquement l\'un l\'autre.</p>' +
       '<table class="suivi-grid"><thead><tr><th>Élève</th><th>Note /8</th><th>Détail par problème</th></tr></thead><tbody>' + rows + '</tbody></table>';
 
-    container.querySelectorAll('.suivi-detail-toggle').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var detailRow = btn.closest('tr').nextElementSibling;
-        var open = detailRow.style.display !== 'none';
-        detailRow.style.display = open ? 'none' : '';
-        btn.classList.toggle('open', !open);
+    container.querySelectorAll('tbody tr[data-eleve-id]').forEach(function (tr) {
+      var noteInput = tr.querySelector('.note-input');
+      var boxes = tr.querySelectorAll('.suivi-detail-grid input[type=checkbox]');
+      noteInput.addEventListener('input', function () {
+        var n = parseInt(noteInput.value, 10);
+        if (isNaN(n)) return;
+        n = Math.max(0, Math.min(8, n));
+        boxes.forEach(function (c, i) { c.checked = i < n; });
       });
-    });
-    container.querySelectorAll('.suivi-detail-row input[type=checkbox]').forEach(function (chk) {
-      chk.addEventListener('change', function () {
-        var tr = chk.closest('tr').previousElementSibling;
-        var checks = chk.closest('.suivi-detail-grid').querySelectorAll('input[type=checkbox]');
-        var count = 0; checks.forEach(function (c) { if (c.checked) count++; });
-        tr.querySelector('.note-input').value = count;
-        tr.querySelector('.suivi-detail-toggle').classList.add('has-detail');
+      boxes.forEach(function (chk) {
+        chk.addEventListener('change', function () {
+          var count = 0; boxes.forEach(function (c) { if (c.checked) count++; });
+          noteInput.value = count;
+        });
       });
     });
   }
@@ -158,19 +218,11 @@
     var container = document.getElementById('saisie-grid-container');
     container.querySelectorAll('tbody tr[data-eleve-id]').forEach(function (tr) {
       var eleveId = tr.getAttribute('data-eleve-id');
-      var noteInput = tr.querySelector('.note-input');
-      var toggle = tr.querySelector('.suivi-detail-toggle');
-      var score = parseInt(noteInput.value, 10);
+      var score = parseInt(tr.querySelector('.note-input').value, 10);
       if (isNaN(score)) return;
-      var resultat = { score: score, detail: null };
-      if (toggle.classList.contains('has-detail')) {
-        var detailRow = tr.nextElementSibling;
-        var checks = detailRow.querySelectorAll('input[type=checkbox]');
-        resultat.detail = problems.map(function (p, i) {
-          return { cat: p.cat, correct: checks[i].checked };
-        });
-      }
-      store.setResultat(data, eleveId, saisieState.niveau.code, saisieState.periode, saisieState.semaine, resultat);
+      var boxes = tr.querySelectorAll('.suivi-detail-grid input[type=checkbox]');
+      var detail = problems.map(function (p, i) { return { cat: p.cat, correct: boxes[i].checked }; });
+      store.setResultat(data, eleveId, saisieState.niveau.code, saisieState.periode, saisieState.semaine, { score: score, detail: detail });
     });
     document.getElementById('saisie-status').textContent = 'Résultats enregistrés — ' + new Date().toLocaleTimeString('fr-FR');
   });
@@ -179,21 +231,18 @@
   var elEE = document.getElementById('ev-eleve'), elEN = document.getElementById('ev-niveau');
 
   function populateEleveSelectors() {
-    elEE.innerHTML = data.eleves.map(function (e) { return '<option value="' + e.id + '">' + escapeHtml(e.nom) + '</option>'; }).join('');
+    var current = elEE.value;
+    elEE.innerHTML = currentEleves().map(function (e) { return '<option value="' + e.id + '">' + escapeHtml(e.nom) + '</option>'; }).join('');
+    if (Array.from(elEE.options).some(function (o) { return o.value === current; })) elEE.value = current;
+    renderEleveTab();
   }
   fillNiveauSelect(elEN);
   elEE.addEventListener('change', renderEleveTab);
   elEN.addEventListener('change', renderEleveTab);
 
-  function barRow(label, pct, valueText) {
-    return '<div class="bar-row"><div class="bar-label">' + escapeHtml(label) + '</div>' +
-      '<div class="bar-track"><div class="bar-fill ' + pctClass(pct) + '" style="width:' + Math.max(0, Math.min(100, pct)) + '%"></div></div>' +
-      '<div class="bar-value">' + escapeHtml(valueText) + '</div></div>';
-  }
-
   function renderEleveTab() {
     var elSemaines = document.getElementById('ev-semaines'), elCategories = document.getElementById('ev-categories');
-    if (!data.eleves.length) {
+    if (!currentEleves().length) {
       elSemaines.innerHTML = elCategories.innerHTML = '<p style="color:var(--text-secondary);font-size:var(--fs-small)">Ajoutez des élèves dans l\'onglet Saisie.</p>';
       return;
     }
@@ -206,92 +255,40 @@
     var weeks = store.weekBreakdown(entries);
     elSemaines.innerHTML = weeks.map(function (w) {
       var pct = Math.round(100 * w.score / 8);
-      return barRow('Période ' + w.periode.replace('P', '') + ' — Semaine ' + w.semaine.replace('S', '') + (w.hasDetail ? '' : ' (note globale)'), pct, w.score.toFixed(1) + '/8');
+      return barRow('Période ' + w.periode.replace('P', '') + ' — Semaine ' + w.semaine.replace('S', ''), pct, w.score.toFixed(1) + '/8');
     }).join('');
     var cats = store.categoryBreakdown(entries);
     elCategories.innerHTML = cats.length ? cats.map(function (c) {
       return barRow(catLabel(c.cat), c.pct, c.correct + '/' + c.total);
-    }).join('') : '<p style="color:var(--text-secondary);font-size:var(--fs-small)">Pas encore de saisie en mode détail pour ce niveau — le suivi par catégorie apparaîtra dès qu\'une semaine sera saisie en détail.</p>';
+    }).join('') : '<p style="color:var(--text-secondary);font-size:var(--fs-small)">Pas encore de saisie en mode détail pour ce niveau.</p>';
   }
 
-  // ===================== Onglet Classe & groupes ==========================
-  var elCS = document.getElementById('cl-selection'), elCN = document.getElementById('cl-niveau'), elCC = document.getElementById('cl-groupes-cat');
+  // ===================== Onglet Classe & classement ========================
+  var elCN = document.getElementById('cl-niveau'), elCC = document.getElementById('cl-classement-cat');
+  var classementSortDesc = true;
   fillNiveauSelect(elCN);
 
-  function renderGestionGroupes() {
-    var el = document.getElementById('gestion-groupes');
-    if (!data.groupes.length) {
-      el.innerHTML = '<p style="color:var(--text-secondary);font-size:var(--fs-small)">Aucun groupe créé pour le moment (facultatif — vous pouvez aussi utiliser "Classe entière").</p>';
-      return;
-    }
-    el.innerHTML = data.groupes.map(function (g) {
-      var checks = data.eleves.map(function (e) {
-        var checked = g.eleveIds.indexOf(e.id) !== -1;
-        return '<label style="margin-right:12px"><input type="checkbox" data-groupe="' + g.id + '" data-eleve="' + e.id + '"' + (checked ? ' checked' : '') + '> ' + escapeHtml(e.nom) + '</label>';
-      }).join('');
-      return '<div class="card" style="background:var(--paper);box-shadow:none;margin-bottom:10px">' +
-        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
-        '<strong>' + escapeHtml(g.nom) + '</strong>' +
-        '<button type="button" class="btn outline" data-supprimer-groupe="' + g.id + '" style="padding:4px 10px">Supprimer</button></div>' +
-        '<div>' + (checks || '<em style="font-size:var(--fs-small)">Ajoutez des élèves d\'abord.</em>') + '</div></div>';
-    }).join('');
-    el.querySelectorAll('input[data-groupe]').forEach(function (chk) {
-      chk.addEventListener('change', function () {
-        var gid = chk.getAttribute('data-groupe');
-        var g = data.groupes.filter(function (g) { return g.id === gid; })[0];
-        var ids = Array.from(el.querySelectorAll('input[data-groupe="' + gid + '"]:checked')).map(function (c) { return c.getAttribute('data-eleve'); });
-        store.setGroupeEleves(data, gid, ids);
-        populateClasseSelection();
-      });
-    });
-    el.querySelectorAll('[data-supprimer-groupe]').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        store.removeGroupe(data, btn.getAttribute('data-supprimer-groupe'));
-        renderGestionGroupes();
-        populateClasseSelection();
-      });
-    });
-  }
-
-  document.getElementById('btn-ajouter-groupe').addEventListener('click', function () {
-    var inp = document.getElementById('inp-nouveau-groupe');
-    var nom = inp.value.trim();
-    if (!nom) return;
-    store.addGroupe(data, nom);
-    inp.value = '';
-    renderGestionGroupes();
-    populateClasseSelection();
-  });
-
-  function populateClasseSelection() {
-    var current = elCS.value;
-    elCS.innerHTML = '<option value="ALL">Classe entière</option>' +
-      data.groupes.map(function (g) { return '<option value="' + g.id + '">' + escapeHtml(g.nom) + '</option>'; }).join('');
-    if (Array.from(elCS.options).some(function (o) { return o.value === current; })) elCS.value = current;
-  }
-
-  function currentEleveIds() {
-    if (elCS.value === 'ALL') return data.eleves.map(function (e) { return e.id; });
-    var g = data.groupes.filter(function (g) { return g.id === elCS.value; })[0];
-    return g ? g.eleveIds : [];
-  }
-
-  elCS.addEventListener('change', renderClasseTab);
   elCN.addEventListener('change', renderClasseTab);
-  elCC.addEventListener('change', renderGroupesTravail);
+  elCC.addEventListener('change', renderClassement);
+
+  document.getElementById('btn-classement-sens').addEventListener('click', function () {
+    classementSortDesc = !classementSortDesc;
+    document.getElementById('btn-classement-sens').textContent = classementSortDesc ? '⇅ Meilleurs en premier' : '⇅ Moins bons en premier';
+    renderClassement();
+  });
 
   function renderClasseTab() {
     var elSemaines = document.getElementById('cl-semaines'), elCategories = document.getElementById('cl-categories');
     var eleveIds = currentEleveIds();
     if (!eleveIds.length) {
-      elSemaines.innerHTML = elCategories.innerHTML = '<p style="color:var(--text-secondary);font-size:var(--fs-small)">Aucun élève dans cette sélection.</p>';
-      renderGroupesCatOptions([]);
+      elSemaines.innerHTML = elCategories.innerHTML = '<p style="color:var(--text-secondary);font-size:var(--fs-small)">Aucun élève dans cette classe.</p>';
+      renderClassementCatOptions([]);
       return;
     }
     var entries = store.resultatsForEleves(data, eleveIds, elCN.value);
     if (!entries.length) {
       elSemaines.innerHTML = elCategories.innerHTML = '<p style="color:var(--text-secondary);font-size:var(--fs-small)">Aucun résultat saisi pour ce niveau.</p>';
-      renderGroupesCatOptions([]);
+      renderClassementCatOptions([]);
       return;
     }
     var weeks = store.weekBreakdown(entries);
@@ -303,38 +300,37 @@
     elCategories.innerHTML = cats.length ? cats.map(function (c) {
       return barRow(catLabel(c.cat), c.pct, c.correct + '/' + c.total);
     }).join('') : '<p style="color:var(--text-secondary);font-size:var(--fs-small)">Pas encore de saisie en détail pour ce niveau.</p>';
-    renderGroupesCatOptions(store.allCategoriesSeen(data, eleveIds, elCN.value));
+    renderClassementCatOptions(store.allCategoriesSeen(data, eleveIds, elCN.value));
   }
 
-  function renderGroupesCatOptions(cats) {
+  function renderClassementCatOptions(cats) {
+    var current = elCC.value;
     elCC.innerHTML = '<option value="GLOBAL">Note globale (toutes catégories)</option>' +
       cats.map(function (c) { return '<option value="' + c + '">' + escapeHtml(catLabel(c)) + '</option>'; }).join('');
-    renderGroupesTravail();
+    if (Array.from(elCC.options).some(function (o) { return o.value === current; })) elCC.value = current;
+    renderClassement();
   }
 
-  function groupeCard(titre, cls, items) {
-    var names = items.map(function (r) {
-      var e = data.eleves.filter(function (e) { return e.id === r.eleveId; })[0];
-      return '<li>' + escapeHtml(e ? e.nom : '?') + ' — ' + r.pct + '%</li>';
-    }).join('');
-    return '<div class="groupe-card ' + cls + '"><h4>' + titre + ' (' + items.length + ')</h4><ul>' + (names || '<li>—</li>') + '</ul></div>';
-  }
-
-  function renderGroupesTravail() {
-    var el = document.getElementById('cl-groupes-resultat');
+  function renderClassement() {
+    var el = document.getElementById('cl-classement');
     var eleveIds = currentEleveIds();
     if (!eleveIds.length || !elCC.options.length) { el.innerHTML = ''; return; }
-    var res = store.proposeGroups(data, eleveIds, elCN.value, elCC.value);
-    var html = '<div class="groupes-row">' +
-      groupeCard('À renforcer', 'renforcement', res.renforcement) +
-      groupeCard('En consolidation', 'consolidation', res.consolidation) +
-      groupeCard('Autonomie', 'autonomie', res.autonomie) +
-      '</div>';
-    if (res.sansDonnees.length) {
-      html += '<p style="margin-top:10px;color:var(--text-secondary);font-size:var(--fs-small)">Pas encore de données pour : ' +
-        res.sansDonnees.map(function (r) { var e = data.eleves.filter(function (e) { return e.id === r.eleveId; })[0]; return escapeHtml(e ? e.nom : '?'); }).join(', ') + '</p>';
-    }
-    el.innerHTML = html;
+    var res = store.rankByCategory(data, eleveIds, elCN.value, elCC.value);
+    var list = res.classement.slice();
+    if (!classementSortDesc) list.reverse();
+    var rows = list.map(function (r, i) {
+      return '<div class="classement-row">' +
+        '<span class="classement-rank">' + (i + 1) + '.</span>' +
+        '<div class="bar-label">' + escapeHtml(eleveName(r.eleveId)) + '</div>' +
+        '<div class="bar-track"><div class="bar-fill ' + pctClass(r.pct) + '" style="width:' + Math.max(0, Math.min(100, r.pct)) + '%"></div></div>' +
+        '<div class="bar-value">' + r.pct + '%</div>' +
+        '</div>';
+    }).join('');
+    var sansHtml = res.sansDonnees.length
+      ? '<p style="margin-top:10px;color:var(--text-secondary);font-size:var(--fs-small)">Pas encore de données pour : ' +
+        res.sansDonnees.map(function (r) { return escapeHtml(eleveName(r.eleveId)); }).join(', ') + '</p>'
+      : '';
+    el.innerHTML = (rows || '<p style="color:var(--text-secondary);font-size:var(--fs-small)">Pas encore de données pour cette catégorie.</p>') + sansHtml;
   }
 
   // ===================== Onglets (navigation) =============================
@@ -350,10 +346,10 @@
   });
 
   // ===================== Initialisation ====================================
+  populateClasseSelect();
   renderListeEleves();
   initSaisieSelectors();
   renderSaisieGrid();
   populateEleveSelectors();
-  renderGestionGroupes();
-  populateClasseSelection();
+  renderClasseTab();
 })();

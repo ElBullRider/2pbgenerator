@@ -217,6 +217,7 @@ table.eleve-evalgrid thead th.bilan{background:var(--navy-900)}
   .corrige-band__answer .rep{font-size:14px}
   .corrige-band__answer .expl{display:none}
   .corrige-daylabel{margin:8px 0 4px;padding:4px 10px;font-size:12px}
+  .corrige-daylabel--3{break-before:page;page-break-before:always}
 }
 
 /* ===== Suivi des élèves ===== */
@@ -234,14 +235,18 @@ table.eleve-evalgrid thead th.bilan{background:var(--navy-900)}
 .eleve-chip button{background:none;border:none;color:var(--gray-500);cursor:pointer;font-size:14px;line-height:1;padding:2px 4px}
 .eleve-chip button:hover{color:var(--orange-700)}
 
+.eleves-bulk{display:flex;gap:var(--space-2);align-items:flex-start;flex-wrap:wrap;margin-bottom:var(--space-4)}
+.eleves-bulk textarea{flex:1 1 260px;min-width:220px;padding:8px 12px;border:1px solid var(--border-subtle);
+  border-radius:var(--radius-sm);font-size:var(--fs-body);font-family:inherit;resize:vertical}
+
+.classe-bar{display:flex;gap:var(--space-2);align-items:center;flex-wrap:wrap}
+.classe-bar select{font-family:var(--font-body);font-size:var(--fs-body);padding:8px 12px;border:1px solid var(--border-subtle);
+  border-radius:var(--radius-sm);background:var(--white);color:var(--text-primary);min-width:180px}
+
 table.suivi-grid{width:100%;border-collapse:collapse;font-size:var(--fs-small)}
 table.suivi-grid th,table.suivi-grid td{border:1px solid var(--border-subtle);padding:8px 10px;text-align:left;vertical-align:middle}
 table.suivi-grid th{background:var(--paper);font-family:var(--font-display);font-weight:var(--fw-bold)}
 table.suivi-grid input[type=number]{width:56px;padding:4px 6px;border:1px solid var(--border-subtle);border-radius:var(--radius-sm)}
-.suivi-detail-toggle{background:none;border:1px solid var(--border-subtle);border-radius:var(--radius-sm);
-  padding:4px 10px;font-size:var(--fs-caption);cursor:pointer;color:var(--text-secondary)}
-.suivi-detail-toggle.open{background:var(--blue-deep);color:var(--white);border-color:var(--blue-deep)}
-.suivi-detail-row td{background:var(--paper)}
 .suivi-detail-grid{display:flex;gap:8px;flex-wrap:wrap}
 .suivi-detail-item{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:var(--fs-caption);
   background:var(--white);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);padding:4px 8px;min-width:64px}
@@ -256,15 +261,10 @@ table.suivi-grid input[type=number]{width:56px;padding:4px 6px;border:1px solid 
 .bar-fill.high{background:var(--green-700)}
 .bar-value{flex:0 0 70px;text-align:right;font-size:var(--fs-small);font-family:var(--font-display);font-weight:var(--fw-bold)}
 
-/* groupes de travail */
-.groupes-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:var(--space-4);margin-top:var(--space-4)}
-.groupe-card{border-radius:var(--radius-md);padding:var(--space-4);color:var(--white)}
-.groupe-card.renforcement{background:var(--orange-700)}
-.groupe-card.consolidation{background:var(--blue-deep)}
-.groupe-card.autonomie{background:var(--green-700)}
-.groupe-card h4{color:var(--white);margin-bottom:8px}
-.groupe-card ul{margin:0;padding-left:18px}
-.groupe-card li{margin-bottom:2px}
+/* classement trié par catégorie */
+.classement-toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-3);gap:var(--space-2);flex-wrap:wrap}
+.classement-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.classement-rank{flex:0 0 26px;text-align:right;font-family:var(--font-display);font-weight:var(--fw-bold);color:var(--text-secondary)}
 
 /* ===== Sélecteur de niveau en bulles (onglets) ===== */
 .niveau-pills{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:var(--space-4)}

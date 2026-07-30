@@ -209,14 +209,14 @@ table.eleve-evalgrid thead th.bilan{background:var(--navy-900)}
   .corrige-print-banner{margin-bottom:6px;padding:6px 14px}
   .corrige-print-banner h1{font-size:16px!important}
   .corrige-print-banner p{font-size:10px;margin:2px 0 0}
-  .corrige-band{box-shadow:none;margin-bottom:6px;border-radius:0}
+  .corrige-band{box-shadow:none;margin-bottom:6px;border-radius:0;break-inside:avoid;page-break-inside:avoid}
   .corrige-band__badge{flex-basis:70px;padding:4px}
   .corrige-band__badge .num{font-size:20px}
   .corrige-band__enonce,.corrige-band__schema,.corrige-band__answer{padding:6px 10px}
   .corrige-band__enonce{font-size:11px}
   .corrige-band__answer .rep{font-size:14px}
   .corrige-band__answer .expl{display:none}
-  .corrige-daylabel{margin:8px 0 4px;padding:4px 10px;font-size:12px}
+  .corrige-daylabel{margin:8px 0 4px;padding:4px 10px;font-size:12px;display:block}
   .corrige-daylabel--3{break-before:page;page-break-before:always}
 }
 

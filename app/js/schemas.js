@@ -143,13 +143,24 @@
     var w = 280, h = 100;
     var cols = Math.max(1, Math.min(8, parseInt(spec.b) || 4));
     var rows = Math.max(1, Math.min(4, parseInt(spec.a) || 3));
-    var cell = 16, ox = 15, oy = 15, s = '';
+    var cell = 16, gap = 3, ox = 15, oy = 15, s = '';
     for (var r = 0; r < rows; r++) {
       for (var c = 0; c < cols; c++) {
-        s += rect(ox + c * (cell + 3), oy + r * (cell + 3), cell, cell, COLOR.blueMid, COLOR.blueDeep);
+        s += rect(ox + c * (cell + gap), oy + r * (cell + gap), cell, cell, COLOR.blueMid, COLOR.blueDeep);
       }
     }
-    s += text(ox + (cols * (cell + 3)) / 2, oy + rows * (cell + 3) + 16, spec.a + ' ' + spec.op + ' ' + spec.b + ' = ' + spec.result, { bold: true, size: 13 });
+    var labelY = oy + rows * (cell + gap) + 16;
+    s += text(ox + (cols * (cell + gap)) / 2, labelY, spec.a + ' ' + spec.op + ' ' + spec.b + ' = ' + spec.result, { bold: true, size: 13 });
+    // Vérificateur de cadre : si la grille + l'étiquette dépassent le canevas
+    // fixe (ex. 4 lignes pleines), on réduit tout proportionnellement plutôt
+    // que de laisser le SVG couper le bas de l'image.
+    var contentW = ox + cols * (cell + gap) + ox;
+    var contentH = labelY + 8;
+    var scale = Math.min(1, w / contentW, h / contentH);
+    if (scale < 1) {
+      var dx = (w - contentW * scale) / 2;
+      s = '<g transform="translate(' + dx.toFixed(1) + ',0) scale(' + scale.toFixed(3) + ')">' + s + '</g>';
+    }
     return svgTag(s, w, h);
   }
   function svgProp(spec) {

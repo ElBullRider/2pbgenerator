@@ -6,22 +6,21 @@
 <link rel="stylesheet" href="css/iep1.css">
 </head>
 <body>
-<div class="iep1-topbar">
+<div class="iep1-topbar no-print">
   <strong style="font-family:var(--font-display)">IEP1 — Deux challenges par jour</strong>
   <nav>
     <a href="accueil.html">Accueil</a>
     <a href="generateur.html" class="active">Générateur</a>
-    <a href="corrige.html" id="nav-corrige">Corrigé illustré</a>
-    <a href="suivi.html">Suivi</a>
+    <a href="suivi.html">Suivi des résultats</a>
   </nav>
 </div>
 <div class="iep1-shell">
-  <div class="iep1-banner">
+  <div class="iep1-banner no-print">
     <h1>Générateur de fiches</h1>
-    <p>Choisissez le niveau, la période et la semaine, puis sélectionnez exactement 8 problèmes.</p>
+    <p>Choisissez le niveau, la période et la semaine, sélectionnez 8 problèmes, puis passez directement à la fiche élève ou au corrigé — tout se passe sur cette page.</p>
   </div>
 
-  <div class="card">
+  <div class="card no-print">
     <label style="display:block;margin-bottom:6px;font-family:var(--font-display);font-weight:var(--fw-bold);font-size:var(--fs-small);color:var(--text-secondary)">Niveau</label>
     <div id="niveau-pills" class="niveau-pills"></div>
     <div class="field-row">
@@ -37,28 +36,42 @@
     <div id="ref-box"></div>
   </div>
 
-  <div class="card">
-    <h3 style="margin-bottom:8px">Sélectionner les problèmes à utiliser</h3>
-    <table class="problemes" id="tbl-problemes">
-      <thead><tr><th></th><th>N°</th><th>Type</th><th>Énoncé</th><th>Jour</th></tr></thead>
-      <tbody></tbody>
-    </table>
-    <div id="lock-msg" style="margin-top:12px"></div>
+  <div class="suivi-tabs no-print">
+    <button class="suivi-tab active" data-tab="selection">Sélection des problèmes</button>
+    <button class="suivi-tab" data-tab="eleve">Fiche élève</button>
+    <button class="suivi-tab" data-tab="corrige">Corrigé enseignant</button>
   </div>
 
-  <div class="card">
-    <h3 style="margin-bottom:12px">Voir / imprimer</h3>
-    <p style="margin-bottom:12px;color:var(--text-secondary);font-size:var(--fs-small)">
-      Ouvre la fiche dans un nouvel onglet, prête à imprimer ou à enregistrer
-      en PDF depuis le navigateur (Imprimer → Enregistrer en PDF).
-    </p>
-    <div style="display:flex;gap:12px;flex-wrap:wrap">
-      <a class="btn primary" id="lnk-eleve" target="_blank">Fiche élève</a>
-      <a class="btn navy" id="lnk-corrige">Corrigé enseignant</a>
+  <!-- ===== Onglet Sélection ===== -->
+  <div class="suivi-panel active no-print" id="panel-selection">
+    <div class="card">
+      <h3 style="margin-bottom:8px">Sélectionner les problèmes à utiliser</h3>
+      <table class="problemes" id="tbl-problemes">
+        <thead><tr><th></th><th>N°</th><th>Type</th><th>Énoncé</th><th>Jour</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <div id="lock-msg" style="margin-top:12px"></div>
     </div>
   </div>
+
+  <!-- ===== Onglet Fiche élève ===== -->
+  <div class="suivi-panel" id="panel-eleve">
+    <div class="print-toolbar no-print">
+      <button class="btn primary" id="btn-print-eleve">Imprimer / Enregistrer en PDF</button>
+    </div>
+    <div id="eleve-content"></div>
+  </div>
+
+  <!-- ===== Onglet Corrigé enseignant ===== -->
+  <div class="suivi-panel" id="panel-corrige">
+    <div class="print-toolbar no-print">
+      <button class="btn primary" id="btn-print-corrige">Imprimer / Enregistrer en PDF</button>
+    </div>
+    <div id="corrige-banner"></div>
+    <div id="corrige-content"></div>
+  </div>
 </div>
-<footer class="iep1-footer">IEP1 — Inspection de l'Enseignement Primaire, circonscription 1 — Gouvernement de la Nouvelle-Calédonie</footer>
+<footer class="iep1-footer no-print">IEP1 — Inspection de l'Enseignement Primaire, circonscription 1 — Gouvernement de la Nouvelle-Calédonie</footer>
 
 <script src="data/cm1.js"></script>
 <script src="data/cm2.js"></script>
@@ -66,6 +79,7 @@
 <script src="data/ce1.js"></script>
 <script src="data/ce2.js"></script>
 <script src="js/cat-labels.js"></script>
+<script src="js/schemas.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 /*
  * Schémas visuels par catégorie Vergnaud — un seul générateur de spec par
  * famille de catégories, rendu en SVG (utilisé à l'écran et à l'impression,
- * fiche-eleve.html / corrige.html). Les valeurs viennent de
+ * generateur.html, onglets Fiche élève / Corrigé). Les valeurs viennent de
  * `schema.known`/`schema.unknown` (dérivées du premier pas de calcul) : le
  * diagramme est une aide visuelle générique, la méthode complète et exacte
  * reste toujours affichée en texte à côté (colonne "Calcul").
